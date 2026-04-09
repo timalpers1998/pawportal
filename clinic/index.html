@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawPortal — Clinic Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-light: #ccfbf1;
+      --orange: #f97316;
+      --green: #16a34a;
+      --red: #dc2626;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.2rem; font-weight: 700; color: var(--teal);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px; height: 32px; background: var(--teal);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-size: 1rem;
+    }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .clinic-badge {
+      background: var(--teal-light); color: var(--teal-dark);
+      padding: 0.3rem 0.8rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .logout-btn {
+      background: none; border: 1.5px solid var(--gray-200);
+      color: var(--gray-700); padding: 0.4rem 0.9rem;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* MAIN */
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; }
+    .page-header p { color: var(--gray-500); margin-top: 0.3rem; }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--gray-500); font-weight: 500; margin-bottom: 0.4rem; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--gray-900); }
+    .stat-card.highlight { background: var(--teal); border-color: var(--teal); }
+    .stat-card.highlight .stat-label { color: rgba(255,255,255,0.7); }
+    .stat-card.highlight .stat-value { color: white; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.4rem 1rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: white;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active {
+      background: var(--gray-900);
+      border-color: var(--gray-900);
+      color: white;
+    }
+
+    /* TABLE */
+    .table-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--gray-50); }
+    th {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    td {
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+
+    .pet-cell { font-weight: 600; }
+    .pet-species { font-size: 0.78rem; color: var(--gray-500); font-weight: 400; }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 0.25rem 0.7rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .status-pending  { background: #fef9c3; color: #854d0e; }
+    .status-confirmed { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+    .action-btns { display: flex; gap: 0.5rem; }
+    .action-btn {
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    .action-btn:hover { opacity: 0.8; }
+    .btn-confirm { background: #dcfce7; color: #166534; }
+    .btn-cancel  { background: #fee2e2; color: #991b1b; }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray-500);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.3rem; }
+
+    /* Loading */
+    .loading {
+      text-align: center; padding: 4rem;
+      color: var(--gray-500); font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-icon">🐾</div>
+      PawPortal
+    </a>
+    <div class="nav-right">
+      <span class="clinic-badge" id="clinicBadge">Loading…</span>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Bookings Dashboard</h1>
+      <p>Manage all incoming appointment requests</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-value" id="statPending">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Confirmed</div>
+        <div class="stat-value" id="statConfirmed">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="statToday">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Bookings</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterBookings('all', this)">All</button>
+      <button class="filter-btn" onclick="filterBookings('pending', this)">Pending</button>
+      <button class="filter-btn" onclick="filterBookings('confirmed', this)">Confirmed</button>
+      <button class="filter-btn" onclick="filterBookings('cancelled', this)">Cancelled</button>
+    </div>
+
+    <div class="table-card">
+      <div class="loading" id="loadingState">Loading bookings…</div>
+      <table id="bookingsTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Pet</th>
+            <th>Owner</th>
+            <th>Service</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="icon">📭</div>
+        <h3>No bookings yet</h3>
+        <p>New booking requests will appear here</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase } from '/js/supabase.js';
+
+    let allBookings = [];
+    let clinicName = '';
+
+    // Auth guard
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = '/login.html'; }
+
+    // Load profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile || profile.role !== 'clinic') {
+      window.location.href = '/account/';
+    }
+
+    clinicName = profile.clinic_name || 'Your Clinic';
+    document.getElementById('clinicBadge').textContent = '🏥 ' + clinicName;
+
+    // Load bookings for this clinic
+    async function loadBookings() {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('clinic', clinicName)
+        .order('appointment_date', { ascending: true });
+
+      allBookings = data || [];
+      renderBookings(allBookings);
+      updateStats(allBookings);
+      document.getElementById('loadingState').style.display = 'none';
+    }
+
+    function updateStats(bookings) {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('statPending').textContent   = bookings.filter(b => b.status === 'pending').length;
+      document.getElementById('statConfirmed').textContent = bookings.filter(b => b.status === 'confirmed').length;
+      document.getElementById('statToday').textContent     = bookings.filter(b => b.appointment_date === today).length;
+      document.getElementById('statTotal').textContent     = bookings.length;
+    }
+
+    function renderBookings(bookings) {
+      const tbody = document.getElementById('bookingsBody');
+      const table = document.getElementById('bookingsTable');
+      const empty = document.getElementById('emptyState');
+
+      if (bookings.length === 0) {
+        table.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+
+      table.style.display = 'table';
+      empty.style.display = 'none';
+
+      tbody.innerHTML = bookings.map(b => {
+        const date = new Date(b.appointment_date + 'T12:00:00').toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+        const statusClass = `status-${b.status}`;
+        const statusLabel = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+        const actions = b.status === 'pending'
+          ? `<button class="action-btn btn-confirm" onclick="updateStatus('${b.id}', 'confirmed')">Confirm</button>
+             <button class="action-btn btn-cancel"  onclick="updateStatus('${b.id}', 'cancelled')">Cancel</button>`
+          : b.status === 'confirmed'
+          ? `<button class="action-btn btn-cancel" onclick="updateStatus('${b.id}', 'cancelled')">Cancel</button>`
+          : '—';
+
+        return `<tr>
+          <td class="pet-cell">${b.pet_name} <span class="pet-species">${b.species}</span></td>
+          <td>${b.first_name} ${b.last_name}<br><span style="font-size:0.78rem;color:var(--gray-500)">${b.email}</span></td>
+          <td>${b.service_type}</td>
+          <td>${date}<br><span style="font-size:0.78rem;color:var(--gray-500)">${b.appointment_time}</span></td>
+          <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+          <td><div class="action-btns">${actions}</div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.updateStatus = async function(id, status) {
+      await supabase.from('bookings').update({ status }).eq('id', id);
+      await loadBookings();
+    };
+
+    window.filterBookings = function(filter, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = filter === 'all' ? allBookings : allBookings.filter(b => b.status === filter);
+      renderBookings(filtered);
+    };
+
+    window.logout = async function() {
+      await supabase.auth.signOut();
+      window.location.href = '/login.html';
+    };
+
+    loadBookings();
+  </script>
+
+</body>
+</html>

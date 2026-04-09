@@ -519,7 +519,7 @@
       <li><a href="#">Wellness Plans</a></li>
       <li><a href="#">Pricing</a></li>
     </ul>
-    <button class="cta-btn">Clinic Login</button>
+    <a href="/login.html" class="cta-btn" id="navLoginBtn" style="text-decoration:none">Sign In</a>
   </nav>
 
   <!-- HERO -->
@@ -727,12 +727,15 @@
   </footer>
 
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { supabase } from '/js/supabase.js';
 
-    const supabase = createClient(
-      'https://ngmvfblgthpvuxoihvsy.supabase.co',
-      'sb_publishable_-AJApbYK4FUMktxOy82C4A_hNtsfg17'
-    );
+    // Update nav if already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const navBtn = document.getElementById('navLoginBtn');
+      navBtn.textContent = 'My Account';
+      navBtn.href = '/account/';
+    }
 
     // Set minimum date to today
     const dateInput = document.getElementById('apptDate');
@@ -776,7 +779,8 @@
       btn.textContent = 'Saving…';
       btn.disabled = true;
 
-      // Save to Supabase
+      // Save to Supabase (link to user account if logged in)
+      const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.from('bookings').insert({
         first_name: firstName,
         last_name: lastName,
@@ -790,7 +794,8 @@
         service_type: selectedService,
         appointment_date: date,
         appointment_time: time,
-        notes
+        notes,
+        user_id: session?.user?.id || null
       });
 
       btn.textContent = 'Confirm Booking →';
