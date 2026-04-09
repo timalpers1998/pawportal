@@ -70,28 +70,40 @@
     }
 
     /* Location autocomplete */
-    .location-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
     .autocomplete-dropdown {
-      position: absolute; top: calc(100% + 4px); left: -1.2rem;
-      background: white; border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0; right: 0;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 16px 40px rgba(0,0,0,0.15);
       border: 1px solid var(--gray-200);
-      z-index: 999; min-width: 280px; overflow: hidden;
+      z-index: 9999;
+      min-width: 320px;
+      overflow: hidden;
       display: none;
     }
     .autocomplete-dropdown.visible { display: block; }
     .autocomplete-item {
-      padding: 0.7rem 1rem; font-size: 0.88rem; cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-      border-bottom: 1px solid var(--gray-100); transition: background 0.1s;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.1s;
     }
-    .autocomplete-item:last-child { border-bottom: none; }
     .autocomplete-item:hover { background: var(--gray-50); }
-    .autocomplete-item .place-icon { font-size: 1rem; flex-shrink: 0; }
-    .autocomplete-item .place-name { font-weight: 600; color: var(--gray-900); }
-    .autocomplete-item .place-detail { font-size: 0.78rem; color: var(--gray-500); }
+    .place-icon-box {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: var(--gray-100); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .autocomplete-item .place-name { font-weight: 600; color: var(--gray-900); line-height: 1.2; }
+    .autocomplete-item .place-detail { font-size: 0.78rem; color: var(--gray-500); margin-top: 1px; }
     .autocomplete-loading {
-      padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--gray-500);
+      padding: 1rem 1.1rem; font-size: 0.85rem; color: var(--gray-500);
       display: flex; align-items: center; gap: 8px;
     }
 
@@ -102,8 +114,9 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.2);
       display: flex; align-items: center;
       max-width: 720px; margin: 0 auto;
-      overflow: hidden;
     }
+    .search-bar > .search-field:first-child { border-radius: 16px 0 0 16px; overflow: hidden; }
+    .search-bar > .search-field:last-of-type { border-radius: 0; }
     .search-field {
       display: flex; align-items: center; gap: 10px;
       padding: 0 1.2rem; flex: 1; border-right: 1px solid var(--gray-200);
@@ -663,7 +676,7 @@
                       : r.type === 'neighbourhood' || r.type === 'suburb' ? '📍'
                       : r.class === 'place' ? '📍' : '📌';
         return `<div class="autocomplete-item" onclick="selectLocation('${name.replace(/'/g,"\\'")}', '${city.replace(/'/g,"\\'")}', '${state.replace(/'/g,"\\'")}', '${r.lat}', '${r.lon}')">
-          <span class="place-icon">${icon}</span>
+          <div class="place-icon-box">${icon}</div>
           <div>
             <div class="place-name">${name}</div>
             <div class="place-detail">${detail}</div>
