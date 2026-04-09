@@ -69,6 +69,32 @@
       margin-bottom: 2rem;
     }
 
+    /* Location autocomplete */
+    .location-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
+    .autocomplete-dropdown {
+      position: absolute; top: calc(100% + 4px); left: -1.2rem;
+      background: white; border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      border: 1px solid var(--gray-200);
+      z-index: 999; min-width: 280px; overflow: hidden;
+      display: none;
+    }
+    .autocomplete-dropdown.visible { display: block; }
+    .autocomplete-item {
+      padding: 0.7rem 1rem; font-size: 0.88rem; cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--gray-100); transition: background 0.1s;
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: var(--gray-50); }
+    .autocomplete-item .place-icon { font-size: 1rem; flex-shrink: 0; }
+    .autocomplete-item .place-name { font-weight: 600; color: var(--gray-900); }
+    .autocomplete-item .place-detail { font-size: 0.78rem; color: var(--gray-500); }
+    .autocomplete-loading {
+      padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--gray-500);
+      display: flex; align-items: center; gap: 8px;
+    }
+
     /* Search bar */
     .search-bar {
       background: white;
@@ -403,12 +429,13 @@
           </select>
         </div>
       </div>
-      <div class="search-field">
+      <div class="search-field" style="position:relative">
         <span class="field-icon">📍</span>
         <div class="search-field-inner">
           <label>Location</label>
-          <input type="text" id="searchLocation" placeholder="City, neighborhood…" />
+          <input type="text" id="searchLocation" placeholder="City, neighborhood, address…" autocomplete="off" />
         </div>
+        <div class="autocomplete-dropdown" id="locationDropdown"></div>
       </div>
       <button class="search-btn" onclick="applyFilters()">
         Search
@@ -581,6 +608,77 @@
     let selectedProvider = null;
     let selectedService = '';
 
+    // ── Location Autocomplete ──
+    let autocompleteTimer = null;
+    let selectedLocation = null;
+
+    const locationInput = document.getElementById('searchLocation');
+    const dropdown = document.getElementById('locationDropdown');
+
+    locationInput.addEventListener('input', () => {
+      const q = locationInput.value.trim();
+      clearTimeout(autocompleteTimer);
+      if (q.length < 2) { dropdown.classList.remove('visible'); return; }
+
+      dropdown.innerHTML = `<div class="autocomplete-loading">🔍 Searching…</div>`;
+      dropdown.classList.add('visible');
+
+      autocompleteTimer = setTimeout(() => fetchLocations(q), 350);
+    });
+
+    locationInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') dropdown.classList.remove('visible');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-field')) dropdown.classList.remove('visible');
+    });
+
+    async function fetchLocations(query) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&countrycodes=us`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        const results = await res.json();
+        renderDropdown(results);
+      } catch {
+        dropdown.classList.remove('visible');
+      }
+    }
+
+    function renderDropdown(results) {
+      if (!results.length) {
+        dropdown.innerHTML = `<div class="autocomplete-loading">No results found</div>`;
+        return;
+      }
+      dropdown.innerHTML = results.map((r, i) => {
+        const addr = r.address;
+        const city    = addr.city || addr.town || addr.village || addr.county || '';
+        const state   = addr.state || '';
+        const country = addr.country || '';
+        const name    = addr.neighbourhood || addr.suburb || city || r.display_name.split(',')[0];
+        const detail  = [city, state, country].filter(Boolean).join(', ');
+        const icon    = r.type === 'city' || r.type === 'town' ? '🏙️'
+                      : r.type === 'neighbourhood' || r.type === 'suburb' ? '📍'
+                      : r.class === 'place' ? '📍' : '📌';
+        return `<div class="autocomplete-item" onclick="selectLocation('${name.replace(/'/g,"\\'")}', '${city.replace(/'/g,"\\'")}', '${state.replace(/'/g,"\\'")}', '${r.lat}', '${r.lon}')">
+          <span class="place-icon">${icon}</span>
+          <div>
+            <div class="place-name">${name}</div>
+            <div class="place-detail">${detail}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    window.selectLocation = function(name, city, state, lat, lon) {
+      selectedLocation = { name, city, state, lat: parseFloat(lat), lon: parseFloat(lon) };
+      locationInput.value = name + (city && name !== city ? `, ${city}` : '') + (state ? `, ${state}` : '');
+      dropdown.classList.remove('visible');
+      applyFilters();
+    };
+
     // Update nav if logged in
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -666,7 +764,7 @@
 
     window.applyFilters = function() {
       const type = document.getElementById('searchType').value;
-      const loc  = document.getElementById('searchLocation').value.trim().toLowerCase();
+      const rawLoc = document.getElementById('searchLocation').value.trim().toLowerCase();
 
       // Sync pill with dropdown
       document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
@@ -676,12 +774,16 @@
 
       let filtered = allProviders;
       if (type !== 'all') filtered = filtered.filter(p => p.type === type);
-      if (loc) filtered = filtered.filter(p =>
-        p.city.toLowerCase().includes(loc) ||
-        p.neighborhood.toLowerCase().includes(loc) ||
-        p.state.toLowerCase().includes(loc) ||
-        p.name.toLowerCase().includes(loc)
-      );
+      if (rawLoc) {
+        // Use selected city from autocomplete if available, else raw text
+        const locQuery = selectedLocation?.city?.toLowerCase() || rawLoc;
+        filtered = filtered.filter(p =>
+          p.city.toLowerCase().includes(locQuery) ||
+          p.neighborhood.toLowerCase().includes(locQuery) ||
+          p.state.toLowerCase().includes(locQuery) ||
+          p.name.toLowerCase().includes(locQuery)
+        );
+      }
       renderProviders(filtered);
     };
 
