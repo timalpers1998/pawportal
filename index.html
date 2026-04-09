@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawPortal — Book Your Vet Appointment</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-light: #ccfbf1;
+      --orange: #f97316;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--teal);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    nav .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav .nav-links a {
+      color: var(--gray-700);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover { color: var(--teal); }
+
+    nav .cta-btn {
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    nav .cta-btn:hover { background: var(--teal-dark); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+      color: white;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.3rem 1rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 span { color: #fde68a; }
+
+    .hero p {
+      font-size: 1.15rem;
+      opacity: 0.9;
+      max-width: 520px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat strong {
+      display: block;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .hero-stat span {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    /* ── BOOKING SECTION ── */
+    .booking-section {
+      max-width: 780px;
+      margin: -3rem auto 4rem;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .booking-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .booking-header {
+      background: var(--teal-light);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .booking-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--teal-dark);
+    }
+
+    .booking-header p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .step-indicator {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gray-200);
+    }
+
+    .step-dot.active { background: var(--teal); }
+
+    /* ── FORM ── */
+    form { padding: 2rem; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    label .required { color: var(--orange); margin-left: 2px; }
+
+    input, select, textarea {
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      font-size: 0.95rem;
+      color: var(--gray-900);
+      background: var(--gray-50);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+      background: white;
+    }
+
+    textarea { resize: vertical; min-height: 90px; }
+
+    .section-divider {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .section-divider span {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* ── SERVICE PILLS ── */
+    .service-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .service-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.4rem 0.9rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: white;
+      color: var(--gray-700);
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .service-pill:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .service-pill.selected {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: white;
+    }
+
+    /* ── SUBMIT ── */
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.8rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-200);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .form-footer .note {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .submit-btn {
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* ── CONFIRMATION ── */
+    .confirmation {
+      display: none;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .confirmation.visible { display: block; }
+    form.hidden { display: none; }
+
+    .confirm-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--teal-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.5rem;
+    }
+
+    .confirmation h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      color: var(--gray-900);
+    }
+
+    .confirmation p {
+      color: var(--gray-500);
+      max-width: 400px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .confirm-details {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      text-align: left;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+
+    .confirm-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .confirm-row:last-child { border-bottom: none; }
+    .confirm-row .label { color: var(--gray-500); }
+    .confirm-row .value { font-weight: 600; color: var(--gray-900); }
+
+    .new-booking-btn {
+      background: white;
+      color: var(--teal);
+      border: 2px solid var(--teal);
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .new-booking-btn:hover { background: var(--teal); color: white; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      background: white;
+      padding: 5rem 2rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-title h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title p {
+      color: var(--gray-500);
+      font-size: 1rem;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .step-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-radius: 16px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      background: var(--teal);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0 auto 1rem;
+    }
+
+    .step-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-card p {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--gray-900);
+      color: white;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+
+    footer .footer-logo {
+      color: var(--teal);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    footer p {
+      color: var(--gray-500);
+      font-size: 0.85rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+      nav .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">
+      <div class="logo-icon">🐾</div>
+      PawPortal
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">For Clinics</a></li>
+      <li><a href="#">Wellness Plans</a></li>
+      <li><a href="#">Pricing</a></li>
+    </ul>
+    <button class="cta-btn">Clinic Login</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🏥 Trusted by 30+ veterinary clinics</div>
+    <h1>Book your pet's vet<br>appointment in <span>60 seconds</span></h1>
+    <p>Simple, digital booking for veterinary care. No phone tag. Instant confirmation. Easy payment plans available.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <strong>30+</strong>
+        <span>Partner Clinics</span>
+      </div>
+      <div class="hero-stat">
+        <strong>0 wait</strong>
+        <span>Instant Confirmation</span>
+      </div>
+      <div class="hero-stat">
+        <strong>$0 down</strong>
+        <span>Wellness Plans Available</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING CARD -->
+  <section class="booking-section">
+    <div class="booking-card">
+
+      <div class="booking-header">
+        <div style="font-size:1.5rem">📅</div>
+        <div>
+          <h2>Book an Appointment</h2>
+          <p>Fill in your details and we'll confirm within minutes</p>
+        </div>
+        <div class="step-indicator">
+          <div class="step-dot active" id="dot1"></div>
+          <div class="step-dot" id="dot2"></div>
+        </div>
+      </div>
+
+      <form id="bookingForm">
+        <div class="form-grid">
+
+          <!-- Owner Info -->
+          <div class="section-divider"><span>Your Information</span></div>
+
+          <div class="form-group">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" id="firstName" placeholder="Jane" required />
+          </div>
+
+          <div class="form-group">
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" id="lastName" placeholder="Smith" required />
+          </div>
+
+          <div class="form-group">
+            <label>Email Address <span class="required">*</span></label>
+            <input type="email" id="email" placeholder="jane@example.com" required />
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="(617) 555-0100" />
+          </div>
+
+          <!-- Pet Info -->
+          <div class="section-divider"><span>Your Pet</span></div>
+
+          <div class="form-group">
+            <label>Pet's Name <span class="required">*</span></label>
+            <input type="text" id="petName" placeholder="Buddy" required />
+          </div>
+
+          <div class="form-group">
+            <label>Species <span class="required">*</span></label>
+            <select id="species" required>
+              <option value="" disabled selected>Select species</option>
+              <option>Dog</option>
+              <option>Cat</option>
+              <option>Rabbit</option>
+              <option>Bird</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Breed</label>
+            <input type="text" id="breed" placeholder="Golden Retriever" />
+          </div>
+
+          <div class="form-group">
+            <label>Age</label>
+            <select id="age">
+              <option value="" disabled selected>Select age</option>
+              <option>Under 1 year</option>
+              <option>1–3 years</option>
+              <option>4–7 years</option>
+              <option>8+ years</option>
+            </select>
+          </div>
+
+          <!-- Appointment -->
+          <div class="section-divider"><span>Appointment Details</span></div>
+
+          <div class="form-group full">
+            <label>Select a Clinic <span class="required">*</span></label>
+            <select id="clinic" required>
+              <option value="" disabled selected>Choose your preferred clinic</option>
+              <option>Boston Animal Hospital — Back Bay</option>
+              <option>Cambridge Pet Clinic — Harvard Square</option>
+              <option>South End Vet Center</option>
+              <option>Brookline Animal Hospital</option>
+              <option>Fenway Feline & Canine Clinic</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Type of Visit <span class="required">*</span></label>
+            <div class="service-pills" id="serviceSelect">
+              <div class="service-pill" data-value="Wellness Checkup">🩺 Wellness Checkup</div>
+              <div class="service-pill" data-value="Vaccination">💉 Vaccination</div>
+              <div class="service-pill" data-value="Dental Cleaning">🦷 Dental Cleaning</div>
+              <div class="service-pill" data-value="Surgery Consult">🔬 Surgery Consult</div>
+              <div class="service-pill" data-value="Sick Visit">🤒 Sick Visit</div>
+              <div class="service-pill" data-value="Follow-up">📋 Follow-up</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Preferred Date <span class="required">*</span></label>
+            <input type="date" id="apptDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Preferred Time <span class="required">*</span></label>
+            <select id="apptTime" required>
+              <option value="" disabled selected>Select time</option>
+              <option>8:00 AM</option>
+              <option>9:00 AM</option>
+              <option>10:00 AM</option>
+              <option>11:00 AM</option>
+              <option>1:00 PM</option>
+              <option>2:00 PM</option>
+              <option>3:00 PM</option>
+              <option>4:00 PM</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Notes for the Vet</label>
+            <textarea id="notes" placeholder="Describe your pet's symptoms or anything the clinic should know..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-footer">
+          <span class="note">🔒 Your information is private and secure</span>
+          <button type="submit" class="submit-btn">
+            Confirm Booking →
+          </button>
+        </div>
+      </form>
+
+      <!-- CONFIRMATION STATE -->
+      <div class="confirmation" id="confirmation">
+        <div class="confirm-icon">✅</div>
+        <h3>You're all set!</h3>
+        <p>Your appointment request has been sent. The clinic will confirm within a few minutes via email.</p>
+        <div class="confirm-details" id="confirmDetails"></div>
+        <button class="new-booking-btn" onclick="resetForm()">Book another appointment</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="section-title">
+      <h2>How PawPortal works</h2>
+      <p>Simple booking in three steps — no phone calls required</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Fill in the form</h3>
+        <p>Enter your details, your pet's info, and choose your preferred clinic and time.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Get confirmed</h3>
+        <p>The clinic receives your request instantly and sends a confirmation to your email.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Show up & relax</h3>
+        <p>We'll send you a reminder the day before. Payment plans available at checkout.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">🐾 PawPortal</div>
+    <p>Connecting pet owners with the care their animals deserve.</p>
+  </footer>
+
+  <script>
+    // Set minimum date to today
+    const dateInput = document.getElementById('apptDate');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+
+    // Service pill selection
+    let selectedService = '';
+    document.querySelectorAll('.service-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.service-pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        selectedService = pill.dataset.value;
+      });
+    });
+
+    // Form submission
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!selectedService) {
+        alert('Please select a type of visit.');
+        return;
+      }
+
+      const firstName = document.getElementById('firstName').value;
+      const petName   = document.getElementById('petName').value;
+      const clinic    = document.getElementById('clinic').value;
+      const date      = document.getElementById('apptDate').value;
+      const time      = document.getElementById('apptTime').value;
+
+      // Format date nicely
+      const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+
+      // Show confirm details
+      document.getElementById('confirmDetails').innerHTML = `
+        <div class="confirm-row"><span class="label">Pet</span><span class="value">${petName}</span></div>
+        <div class="confirm-row"><span class="label">Clinic</span><span class="value">${clinic}</span></div>
+        <div class="confirm-row"><span class="label">Visit Type</span><span class="value">${selectedService}</span></div>
+        <div class="confirm-row"><span class="label">Date</span><span class="value">${formattedDate}</span></div>
+        <div class="confirm-row"><span class="label">Time</span><span class="value">${time}</span></div>
+      `;
+
+      // Transition to confirmation
+      document.getElementById('bookingForm').classList.add('hidden');
+      document.getElementById('dot1').classList.remove('active');
+      document.getElementById('dot2').classList.add('active');
+      document.getElementById('confirmation').classList.add('visible');
+    });
+
+    function resetForm() {
+      document.getElementById('bookingForm').reset();
+      document.getElementById('bookingForm').classList.remove('hidden');
+      document.getElementById('confirmation').classList.remove('visible');
+      document.getElementById('dot1').classList.add('active');
+      document.getElementById('dot2').classList.remove('active');
+      document.querySelectorAll('.service-pill').forEach(p => p.classList.remove('selected'));
+      selectedService = '';
+    }
+  </script>
+
+</body>
+</html>
