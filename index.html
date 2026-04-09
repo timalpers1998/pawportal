@@ -726,7 +726,14 @@
     <p>Connecting pet owners with the care their animals deserve.</p>
   </footer>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://ngmvfblgthpvuxoihvsy.supabase.co',
+      'sb_publishable_-AJApbYK4FUMktxOy82C4A_hNtsfg17'
+    );
+
     // Set minimum date to today
     const dateInput = document.getElementById('apptDate');
     const today = new Date().toISOString().split('T')[0];
@@ -743,7 +750,7 @@
     });
 
     // Form submission
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       if (!selectedService) {
@@ -752,10 +759,48 @@
       }
 
       const firstName = document.getElementById('firstName').value;
+      const lastName  = document.getElementById('lastName').value;
+      const email     = document.getElementById('email').value;
+      const phone     = document.getElementById('phone').value;
       const petName   = document.getElementById('petName').value;
+      const species   = document.getElementById('species').value;
+      const breed     = document.getElementById('breed').value;
+      const age       = document.getElementById('age').value;
       const clinic    = document.getElementById('clinic').value;
       const date      = document.getElementById('apptDate').value;
       const time      = document.getElementById('apptTime').value;
+      const notes     = document.getElementById('notes').value;
+
+      // Disable button while saving
+      const btn = document.querySelector('.submit-btn');
+      btn.textContent = 'Saving…';
+      btn.disabled = true;
+
+      // Save to Supabase
+      const { error } = await supabase.from('bookings').insert({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone,
+        pet_name: petName,
+        species,
+        breed,
+        age,
+        clinic,
+        service_type: selectedService,
+        appointment_date: date,
+        appointment_time: time,
+        notes
+      });
+
+      btn.textContent = 'Confirm Booking →';
+      btn.disabled = false;
+
+      if (error) {
+        alert('Something went wrong saving your booking. Please try again.');
+        console.error(error);
+        return;
+      }
 
       // Format date nicely
       const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
@@ -778,7 +823,7 @@
       document.getElementById('confirmation').classList.add('visible');
     });
 
-    function resetForm() {
+    window.resetForm = function() {
       document.getElementById('bookingForm').reset();
       document.getElementById('bookingForm').classList.remove('hidden');
       document.getElementById('confirmation').classList.remove('visible');
