@@ -352,10 +352,6 @@
             <label for="password">Password</label>
             <input type="password" id="password" placeholder="At least 8 characters" required />
           </div>
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input type="password" id="confirmPassword" placeholder="Repeat your password" required />
-          </div>
           <button class="submit-btn" id="continueBtn" type="button">Continue →</button>
         </div>
 
@@ -464,13 +460,10 @@
       const fullName       = document.getElementById('fullName').value.trim();
       const email          = document.getElementById('email').value.trim();
       const password       = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-
       if (!fullName) { showError('Please enter your full name.'); return; }
       if (!email)    { showError('Please enter your email address.'); return; }
       if (!password) { showError('Please enter a password.'); return; }
       if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
-      if (password !== confirmPassword) { showError('Passwords do not match.'); return; }
 
       // Transition
       document.getElementById('step1').classList.remove('active');
