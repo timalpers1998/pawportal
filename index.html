@@ -778,7 +778,7 @@
         const stars = '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '');
         const typeLabel = { vet: 'Veterinarian', groomer: 'Groomer', walker: 'Dog Walker', trainer: 'Trainer', boarding: 'Boarding' }[p.type] || p.type;
         return `
-          <div class="provider-card" onclick="openModal('${p.id}')">
+          <div class="provider-card" onclick="window.location.href='/provider.html?id=${p.id}'">
             <div class="card-banner banner-${p.type}">
               <span class="type-badge badge-${p.type}">${typeLabel}</span>
               ${p.avatar}
@@ -794,7 +794,7 @@
                 <span>📍 ${p.neighborhood}, ${p.city}</span>
               </div>
               <div class="card-availability">🕐 Next: ${p.next_available}</div>
-              <button class="book-btn">Book Now</button>
+              <button class="book-btn">View & Book</button>
             </div>
           </div>`;
       }).join('');
