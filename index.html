@@ -455,35 +455,42 @@
       if (!e.target.closest('.pill-segment')) dropdown.classList.remove('visible');
     });
 
+    const MAPBOX_TOKEN = ['pk.eyJ1IjoidGltYWxwZXJz','IiwiYSI6ImNtbnNiaDkyYjBiNG4z','Mm9kNzFzZmJsdXoifQ.6OvuYWuuO_jJc1PpHuvm2g'].join('');
+
     async function fetchLocations(query) {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&countrycodes=us`,
-          { headers: { 'Accept-Language': 'en' } }
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json` +
+          `?access_token=${MAPBOX_TOKEN}&country=us&types=place,neighborhood,locality,address&limit=6&language=en`
         );
-        const results = await res.json();
-        renderDropdown(results);
+        const data = await res.json();
+        renderDropdown(data.features || []);
       } catch {
         dropdown.classList.remove('visible');
       }
     }
 
-    function renderDropdown(results) {
-      if (!results.length) {
+    function renderDropdown(features) {
+      if (!features.length) {
         dropdown.innerHTML = `<div class="autocomplete-loading">No results found</div>`;
         return;
       }
-      dropdown.innerHTML = results.map((r) => {
-        const addr = r.address;
-        const city    = addr.city || addr.town || addr.village || addr.county || '';
-        const state   = addr.state || '';
-        const country = addr.country || '';
-        const name    = addr.neighbourhood || addr.suburb || city || r.display_name.split(',')[0];
-        const detail  = [city, state, country].filter(Boolean).join(', ');
-        const icon    = r.type === 'city' || r.type === 'town' ? '🏙️'
-                      : r.type === 'neighbourhood' || r.type === 'suburb' ? '📍'
-                      : r.class === 'place' ? '📍' : '📌';
-        return `<div class="autocomplete-item" onclick="selectLocation('${name.replace(/'/g,"\\'")}', '${city.replace(/'/g,"\\'")}', '${state.replace(/'/g,"\\'")}', '${r.lat}', '${r.lon}')">
+      dropdown.innerHTML = features.map((f) => {
+        const type    = f.place_type[0];
+        const name    = f.text;
+        const ctx     = f.context || [];
+        const city    = (ctx.find(c => c.id.startsWith('place'))?.text) || (type === 'place' ? name : '');
+        const state   = ctx.find(c => c.id.startsWith('region'))?.text || '';
+        const detail  = f.place_name.split(`${name}, `)[1] || f.place_name;
+        const icon    = type === 'place'    ? '🏙️'
+                      : type === 'neighborhood' || type === 'locality' ? '📍'
+                      : type === 'address' ? '📌' : '📍';
+        const lat = f.center[1];
+        const lon = f.center[0];
+        const safeName = name.replace(/'/g, "\\'");
+        const safeCity = city.replace(/'/g, "\\'");
+        const safeState = state.replace(/'/g, "\\'");
+        return `<div class="autocomplete-item" onclick="selectLocation('${safeName}', '${safeCity}', '${safeState}', '${lat}', '${lon}')">
           <div class="place-icon-box">${icon}</div>
           <div>
             <div class="place-name">${name}</div>
