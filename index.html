@@ -14,9 +14,11 @@
       --gray-50: #f8fafc;
       --gray-100: #f1f5f9;
       --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
       --gray-500: #64748b;
       --gray-700: #334155;
       --gray-900: #0f172a;
+      --nav-height: 80px;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -29,9 +31,18 @@
       background: white;
       border-bottom: 1px solid var(--gray-200);
       padding: 0 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 64px; position: sticky; top: 0; z-index: 200;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      height: var(--nav-height);
+      position: sticky;
+      top: 0;
+      z-index: 200;
     }
+    .nav-left { display: flex; align-items: center; }
+    .nav-center { display: flex; justify-content: center; }
+    .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
+
     .logo {
       display: flex; align-items: center; gap: 10px;
       font-size: 1.3rem; font-weight: 800; color: var(--teal);
@@ -42,10 +53,6 @@
       border-radius: 9px; display: flex; align-items: center;
       justify-content: center; font-size: 1.1rem;
     }
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
-    .nav-links a { color: var(--gray-700); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
-    .nav-links a:hover { color: var(--teal); }
-    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
     .nav-signin {
       background: var(--teal); color: white; text-decoration: none;
       padding: 0.45rem 1.1rem; border-radius: 8px;
@@ -53,27 +60,74 @@
     }
     .nav-signin:hover { background: var(--teal-dark); }
 
-    /* ── HERO ── */
-    .hero {
-      background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
-      padding: 4rem 2rem 5rem;
-      text-align: center;
+    /* ── NAV SEARCH PILL ── */
+    .nav-search-pill {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 999px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      height: 52px;
+      transition: box-shadow 0.2s;
     }
-    .hero h1 {
-      color: white; font-size: 2.8rem; font-weight: 800;
-      line-height: 1.15; margin-bottom: 0.75rem;
+    .nav-search-pill:focus-within {
+      box-shadow: 0 2px 16px rgba(0,0,0,0.14);
     }
-    .hero h1 span { color: #fde68a; }
-    .hero p {
-      color: rgba(255,255,255,0.85); font-size: 1.1rem;
-      margin-bottom: 2rem;
+    .pill-segment {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 18px;
+      min-width: 0;
+      cursor: pointer;
+      position: relative;
     }
+    .pill-segment + .pill-segment {
+      border-left: 1.5px solid var(--gray-200);
+    }
+    .pill-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--gray-500);
+      white-space: nowrap;
+      margin-bottom: 1px;
+    }
+    .pill-segment select,
+    .pill-segment input {
+      border: none;
+      outline: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      background: transparent;
+      font-family: inherit;
+      padding: 0;
+      width: 150px;
+    }
+    .pill-segment select { appearance: none; cursor: pointer; width: 130px; }
+    .pill-search-btn {
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      width: 38px; height: 38px;
+      margin-right: 7px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .pill-search-btn:hover { background: var(--teal-dark); }
 
     /* Location autocomplete */
     .autocomplete-dropdown {
       position: absolute;
-      top: calc(100% + 8px);
-      left: 0; right: 0;
+      top: calc(100% + 14px);
+      left: -18px;
       background: white;
       border-radius: 16px;
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 16px 40px rgba(0,0,0,0.15);
@@ -107,151 +161,141 @@
       display: flex; align-items: center; gap: 8px;
     }
 
-    /* Search bar */
-    .search-bar {
+    /* ── CATEGORY BAR ── */
+    .category-bar {
       background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      display: flex; align-items: center;
-      max-width: 720px; margin: 0 auto;
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: var(--nav-height);
+      z-index: 190;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    .search-bar > .search-field:first-child { border-radius: 16px 0 0 16px; overflow: hidden; }
-    .search-bar > .search-field:last-of-type { border-radius: 0; }
-    .search-field {
-      display: flex; align-items: center; gap: 10px;
-      padding: 0 1.2rem; flex: 1; border-right: 1px solid var(--gray-200);
-      height: 64px;
+    .category-bar::-webkit-scrollbar { display: none; }
+    .category-bar-inner {
+      display: flex;
+      padding: 0 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
-    .search-field:last-of-type { border-right: none; }
-    .search-field .field-icon { font-size: 1.1rem; flex-shrink: 0; }
-    .search-field-inner { display: flex; flex-direction: column; flex: 1; }
-    .search-field-inner label {
-      font-size: 0.68rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--gray-500); margin-bottom: 1px;
-    }
-    .search-field-inner input,
-    .search-field-inner select {
-      border: none; outline: none; font-size: 0.92rem;
-      font-weight: 500; color: var(--gray-900); background: transparent;
-      font-family: inherit; padding: 0; width: 100%;
-    }
-    .search-field-inner select { cursor: pointer; appearance: none; }
-    .search-btn {
-      background: var(--teal); color: white; border: none;
-      height: 64px; padding: 0 1.8rem; font-size: 1rem;
-      font-weight: 700; cursor: pointer; transition: background 0.2s;
-      white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    .cat-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 22px 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--gray-500);
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
       flex-shrink: 0;
     }
-    .search-btn:hover { background: var(--teal-dark); }
+    .cat-btn:hover { color: var(--gray-900); border-color: var(--gray-300); }
+    .cat-btn.active { color: var(--gray-900); border-color: var(--gray-900); font-weight: 600; }
+    .cat-icon { font-size: 1.4rem; line-height: 1; }
+    .cat-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.01em; }
 
     /* ── MAIN CONTENT ── */
-    .main-content { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+    .main-content { max-width: 1400px; margin: 0 auto; padding: 2rem 2.5rem; }
 
     .results-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
     }
-    .results-title { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
-    .results-title span { color: var(--gray-500); font-weight: 400; }
+    .results-title { font-size: 1rem; font-weight: 600; color: var(--gray-700); }
+    .results-title strong { color: var(--gray-900); }
 
-    /* Filter pills */
-    .filters {
-      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.8rem;
-    }
-    .filter-pill {
-      display: flex; align-items: center; gap: 6px;
-      padding: 0.45rem 1rem; border: 1.5px solid var(--gray-200);
-      border-radius: 999px; font-size: 0.85rem; font-weight: 500;
-      background: white; color: var(--gray-700); cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-pill:hover { border-color: var(--teal); color: var(--teal); }
-    .filter-pill.active {
-      background: var(--teal); border-color: var(--teal); color: white;
-    }
-
-    /* Provider grid */
+    /* ── PROVIDER GRID ── */
     .providers-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.2rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
     }
 
     .provider-card {
-      background: white;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
+      background: transparent;
+      border-radius: 14px;
+      overflow: visible;
       cursor: pointer;
+      transition: transform 0.2s;
     }
-    .provider-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-      border-color: var(--teal);
-    }
+    .provider-card:hover { transform: translateY(-2px); }
+    .provider-card:hover .card-banner { box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
 
     .card-banner {
-      height: 100px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem;
+      height: 200px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5rem;
       position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
     }
 
-    .type-badge {
-      position: absolute; top: 10px; left: 10px;
-      background: white; border-radius: 999px;
-      padding: 0.2rem 0.7rem; font-size: 0.72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.05em;
+    .card-type-pill {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    .card-body { padding: 1.1rem 1.2rem; }
-    .card-name { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .card-specialty { font-size: 0.82rem; color: var(--gray-500); margin-bottom: 0.6rem; }
-
+    .card-body {
+      padding: 0.85rem 0.25rem 0;
+    }
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2px;
+    }
+    .card-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      margin-right: 8px;
+    }
     .card-rating {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 0.82rem; font-weight: 600; color: var(--gray-700);
-      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      flex-shrink: 0;
     }
-    .stars { color: #f59e0b; }
-
-    .card-meta {
-      display: flex; align-items: center; gap: 1rem;
-      font-size: 0.78rem; color: var(--gray-500); margin-bottom: 0.8rem;
-    }
-    .card-meta span { display: flex; align-items: center; gap: 3px; }
-
-    .card-availability {
-      background: var(--teal-light); color: var(--teal-dark);
-      border-radius: 6px; padding: 0.35rem 0.75rem;
-      font-size: 0.78rem; font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 5px;
-    }
-
-    .book-btn {
-      width: 100%; background: var(--teal); color: white;
-      border: none; padding: 0.65rem; border-radius: 10px;
-      font-size: 0.9rem; font-weight: 700; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .book-btn:hover { background: var(--teal-dark); }
+    .stars { color: #f59e0b; font-size: 0.78rem; }
+    .card-location { font-size: 0.82rem; color: var(--gray-500); margin-bottom: 1px; }
+    .card-avail { font-size: 0.82rem; color: var(--gray-500); }
 
     /* Banner colors by type */
-    .banner-vet       { background: linear-gradient(135deg, #e0f2fe, #bae6fd); }
-    .banner-groomer   { background: linear-gradient(135deg, #fce7f3, #fbcfe8); }
-    .banner-walker    { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
-    .banner-trainer   { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-    .banner-boarding  { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+    .banner-vet      { background: linear-gradient(135deg, #e0f2fe, #bae6fd); }
+    .banner-groomer  { background: linear-gradient(135deg, #fce7f3, #fbcfe8); }
+    .banner-walker   { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+    .banner-trainer  { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+    .banner-boarding { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
 
-    .badge-vet       { color: #0369a1; }
-    .badge-groomer   { color: #9d174d; }
-    .badge-walker    { color: #065f46; }
-    .badge-trainer   { color: #92400e; }
-    .badge-boarding  { color: #5b21b6; }
+    .badge-vet      { color: #0369a1; }
+    .badge-groomer  { color: #9d174d; }
+    .badge-walker   { color: #065f46; }
+    .badge-trainer  { color: #92400e; }
+    .badge-boarding { color: #5b21b6; }
 
     /* Empty state */
     .empty-state {
@@ -261,133 +305,6 @@
     .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.3rem; }
 
-    /* ── BOOKING MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-      z-index: 1000; align-items: center; justify-content: center;
-      padding: 1rem;
-    }
-    .modal-overlay.visible { display: flex; }
-
-    .modal {
-      background: white; border-radius: 20px;
-      width: 100%; max-width: 580px; max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-      animation: slideUp 0.25s ease;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-header {
-      padding: 1.5rem 1.8rem;
-      border-bottom: 1px solid var(--gray-200);
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: white; z-index: 10;
-    }
-    .modal-title h3 { font-size: 1.1rem; font-weight: 700; }
-    .modal-title p  { font-size: 0.82rem; color: var(--gray-500); margin-top: 2px; }
-    .modal-close {
-      background: var(--gray-100); border: none; border-radius: 50%;
-      width: 32px; height: 32px; font-size: 1rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s; color: var(--gray-700);
-    }
-    .modal-close:hover { background: var(--gray-200); }
-
-    .modal-body { padding: 1.5rem 1.8rem; }
-
-    /* Provider summary inside modal */
-    .provider-summary {
-      display: flex; align-items: center; gap: 1rem;
-      background: var(--gray-50); border: 1px solid var(--gray-200);
-      border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
-    }
-    .provider-summary .avatar { font-size: 2rem; }
-    .provider-summary .info h4 { font-size: 0.95rem; font-weight: 700; }
-    .provider-summary .info p  { font-size: 0.8rem; color: var(--gray-500); }
-
-    /* Form */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--gray-700); }
-    .form-group label .req { color: var(--orange); }
-    .form-group input, .form-group select, .form-group textarea {
-      border: 1.5px solid var(--gray-200); border-radius: 9px;
-      padding: 0.6rem 0.9rem; font-size: 0.9rem; color: var(--gray-900);
-      background: var(--gray-50); transition: all 0.2s; font-family: inherit;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none; border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(13,148,136,0.1); background: white;
-    }
-    .form-group textarea { resize: vertical; min-height: 80px; }
-
-    .section-divider {
-      grid-column: 1 / -1; font-size: 0.72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--gray-500); padding: 0.5rem 0;
-      border-bottom: 1px solid var(--gray-200); margin-bottom: 0.25rem;
-    }
-
-    .service-suggestions {
-      position: absolute; top: calc(100% + 2px); left: 0; right: 0;
-      background: white; border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 12px 30px rgba(0,0,0,0.12);
-      border: 1px solid var(--gray-200);
-      z-index: 9999; overflow: hidden; display: none;
-    }
-    .service-suggestions.visible { display: block; }
-    .suggestion-item {
-      padding: 0.7rem 1rem; font-size: 0.88rem; cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-      transition: background 0.1s; color: var(--gray-900);
-    }
-    .suggestion-item:hover { background: var(--gray-50); }
-    .suggestion-item .s-icon { font-size: 1rem; width: 24px; text-align: center; flex-shrink: 0; }
-    .suggestion-item .s-label { font-weight: 500; }
-
-    .modal-footer {
-      padding: 1rem 1.8rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--gray-200); flex-wrap: wrap; gap: 0.75rem;
-    }
-    .modal-footer .note { font-size: 0.76rem; color: var(--gray-500); }
-    .modal-submit {
-      background: var(--teal); color: white; border: none;
-      padding: 0.75rem 1.8rem; border-radius: 10px;
-      font-size: 0.95rem; font-weight: 700; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .modal-submit:hover { background: var(--teal-dark); }
-    .modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* Confirmation inside modal */
-    .modal-confirm { display: none; padding: 2rem; text-align: center; }
-    .modal-confirm.visible { display: block; }
-    .modal-form.hidden { display: none; }
-    .confirm-icon {
-      width: 64px; height: 64px; background: var(--teal-light);
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 1.8rem; margin: 0 auto 1rem;
-    }
-    .confirm-details {
-      background: var(--gray-50); border: 1px solid var(--gray-200);
-      border-radius: 10px; padding: 1rem 1.2rem; text-align: left; margin: 1rem 0 1.5rem;
-    }
-    .confirm-row {
-      display: flex; justify-content: space-between;
-      padding: 0.35rem 0; font-size: 0.85rem;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    .confirm-row:last-child { border-bottom: none; }
-    .confirm-row .lbl { color: var(--gray-500); }
-    .confirm-row .val { font-weight: 600; }
-
     /* ── FOOTER ── */
     footer {
       background: var(--gray-900); color: white;
@@ -396,18 +313,22 @@
     .footer-logo { color: var(--teal); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
     footer p { color: var(--gray-500); font-size: 0.82rem; }
 
-    @media (max-width: 900px) {
-      .providers-grid { grid-template-columns: 1fr 1fr; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1200px) {
+      .providers-grid { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 1.8rem; }
-      .search-bar { flex-direction: column; border-radius: 12px; }
-      .search-field { border-right: none; border-bottom: 1px solid var(--gray-200); }
-      .search-btn { width: 100%; justify-content: center; border-radius: 0; }
+    @media (max-width: 900px) {
+      .providers-grid { grid-template-columns: repeat(2, 1fr); }
+      .pill-segment input, .pill-segment select { width: 110px; }
+    }
+    @media (max-width: 640px) {
+      nav { grid-template-columns: 1fr auto; }
+      .nav-center { display: none; }
+      .main-content { padding: 1.5rem 1rem; }
+      .providers-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    @media (max-width: 420px) {
       .providers-grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.full { grid-column: 1; }
-      nav .nav-links { display: none; }
     }
   </style>
 </head>
@@ -415,30 +336,17 @@
 
   <!-- NAV -->
   <nav>
-    <a href="/" class="logo">
-      <div class="logo-icon">🐾</div>
-      PawPortal
-    </a>
-    <ul class="nav-links">
-      <li><a href="#">For Providers</a></li>
-      <li><a href="#">Wellness Plans</a></li>
-      <li><a href="#">How it Works</a></li>
-    </ul>
-    <div class="nav-right">
-      <a href="/login.html" class="nav-signin" id="navLoginBtn">Sign In</a>
+    <div class="nav-left">
+      <a href="/" class="logo">
+        <div class="logo-icon">🐾</div>
+        PawPortal
+      </a>
     </div>
-  </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Find trusted pet care<br><span>anywhere you are</span></h1>
-    <p>Veterinarians, groomers, walkers, trainers — book in seconds.</p>
-
-    <div class="search-bar">
-      <div class="search-field">
-        <span class="field-icon">🔍</span>
-        <div class="search-field-inner">
-          <label>Service</label>
+    <div class="nav-center">
+      <div class="nav-search-pill">
+        <div class="pill-segment">
+          <span class="pill-label">Service</span>
           <select id="searchType" onchange="applyFilters()">
             <option value="all">All pet care</option>
             <option value="vet">Veterinarians</option>
@@ -448,36 +356,55 @@
             <option value="boarding">Boarding</option>
           </select>
         </div>
-      </div>
-      <div class="search-field" style="position:relative">
-        <span class="field-icon">📍</span>
-        <div class="search-field-inner">
-          <label>Location</label>
-          <input type="text" id="searchLocation" placeholder="City, neighborhood, address…" autocomplete="off" />
+        <div class="pill-segment">
+          <span class="pill-label">Location</span>
+          <input type="text" id="searchLocation" placeholder="City or neighborhood…" autocomplete="off" />
+          <div class="autocomplete-dropdown" id="locationDropdown"></div>
         </div>
-        <div class="autocomplete-dropdown" id="locationDropdown"></div>
+        <button class="pill-search-btn" onclick="applyFilters()" aria-label="Search">🔍</button>
       </div>
-      <button class="search-btn" onclick="applyFilters()">
-        Search
+    </div>
+
+    <div class="nav-right">
+      <a href="/login.html" class="nav-signin" id="navLoginBtn">Sign In</a>
+    </div>
+  </nav>
+
+  <!-- CATEGORY BAR -->
+  <div class="category-bar">
+    <div class="category-bar-inner">
+      <button class="cat-btn active" onclick="setFilter('all', this)">
+        <span class="cat-icon">🐾</span>
+        <span class="cat-label">All</span>
+      </button>
+      <button class="cat-btn" onclick="setFilter('vet', this)">
+        <span class="cat-icon">🏥</span>
+        <span class="cat-label">Vets</span>
+      </button>
+      <button class="cat-btn" onclick="setFilter('groomer', this)">
+        <span class="cat-icon">✂️</span>
+        <span class="cat-label">Groomers</span>
+      </button>
+      <button class="cat-btn" onclick="setFilter('walker', this)">
+        <span class="cat-icon">🦮</span>
+        <span class="cat-label">Walkers</span>
+      </button>
+      <button class="cat-btn" onclick="setFilter('trainer', this)">
+        <span class="cat-icon">🎓</span>
+        <span class="cat-label">Trainers</span>
+      </button>
+      <button class="cat-btn" onclick="setFilter('boarding', this)">
+        <span class="cat-icon">🏠</span>
+        <span class="cat-label">Boarding</span>
       </button>
     </div>
-  </section>
+  </div>
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
 
     <div class="results-header">
       <div class="results-title" id="resultsTitle">Loading providers…</div>
-    </div>
-
-    <!-- Filter pills -->
-    <div class="filters">
-      <button class="filter-pill active" onclick="setFilter('all', this)">🐾 All</button>
-      <button class="filter-pill" onclick="setFilter('vet', this)">🏥 Veterinarians</button>
-      <button class="filter-pill" onclick="setFilter('groomer', this)">✂️ Groomers</button>
-      <button class="filter-pill" onclick="setFilter('walker', this)">🦮 Dog Walkers</button>
-      <button class="filter-pill" onclick="setFilter('trainer', this)">🎓 Trainers</button>
-      <button class="filter-pill" onclick="setFilter('boarding', this)">🏠 Boarding</button>
     </div>
 
     <!-- Provider cards -->
@@ -488,120 +415,6 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- BOOKING MODAL -->
-  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">
-          <h3>Book an Appointment</h3>
-          <p id="modalSubtitle">Fill in your details below</p>
-        </div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-
-      <div class="modal-body">
-
-        <!-- Provider summary -->
-        <div class="provider-summary">
-          <div class="avatar" id="modalAvatar">🏥</div>
-          <div class="info">
-            <h4 id="modalProviderName">Provider</h4>
-            <p id="modalProviderMeta">Loading…</p>
-          </div>
-        </div>
-
-        <!-- Form -->
-        <div class="modal-form" id="modalForm">
-          <div class="form-grid">
-            <div class="section-divider">Your Information</div>
-            <div class="form-group">
-              <label>First Name <span class="req">*</span></label>
-              <input type="text" id="firstName" placeholder="Jane" required />
-            </div>
-            <div class="form-group">
-              <label>Last Name <span class="req">*</span></label>
-              <input type="text" id="lastName" placeholder="Smith" required />
-            </div>
-            <div class="form-group">
-              <label>Email <span class="req">*</span></label>
-              <input type="email" id="email" placeholder="jane@example.com" required />
-            </div>
-            <div class="form-group">
-              <label>Phone</label>
-              <input type="tel" id="phone" placeholder="(617) 555-0100" />
-            </div>
-
-            <div class="section-divider">Your Pet</div>
-            <div class="form-group">
-              <label>Pet's Name <span class="req">*</span></label>
-              <input type="text" id="petName" placeholder="Buddy" required />
-            </div>
-            <div class="form-group">
-              <label>Species <span class="req">*</span></label>
-              <select id="species" required>
-                <option value="" disabled selected>Select</option>
-                <option>Dog</option><option>Cat</option>
-                <option>Rabbit</option><option>Bird</option><option>Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Breed</label>
-              <input type="text" id="breed" placeholder="Golden Retriever" />
-            </div>
-            <div class="form-group">
-              <label>Age</label>
-              <select id="age">
-                <option value="" disabled selected>Select</option>
-                <option>Under 1 year</option><option>1–3 years</option>
-                <option>4–7 years</option><option>8+ years</option>
-              </select>
-            </div>
-
-            <div class="section-divider">Appointment</div>
-            <div class="form-group full" style="position:relative">
-              <label>Type of Visit <span class="req">*</span></label>
-              <input type="text" id="serviceInput" placeholder="e.g. Wellness checkup, grooming, vaccination…" autocomplete="off" />
-              <div class="service-suggestions" id="serviceSuggestions"></div>
-            </div>
-            <div class="form-group">
-              <label>Date <span class="req">*</span></label>
-              <input type="date" id="apptDate" required />
-            </div>
-            <div class="form-group">
-              <label>Time <span class="req">*</span></label>
-              <select id="apptTime" required>
-                <option value="" disabled selected>Select</option>
-                <option>8:00 AM</option><option>9:00 AM</option>
-                <option>10:00 AM</option><option>11:00 AM</option>
-                <option>1:00 PM</option><option>2:00 PM</option>
-                <option>3:00 PM</option><option>4:00 PM</option>
-              </select>
-            </div>
-            <div class="form-group full">
-              <label>Notes</label>
-              <textarea id="notes" placeholder="Describe what you need or any special requests…"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Confirmation -->
-        <div class="modal-confirm" id="modalConfirm">
-          <div class="confirm-icon">✅</div>
-          <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:0.5rem">You're booked!</h3>
-          <p style="color:var(--gray-500);font-size:0.9rem">Confirmation sent to your email. The provider will follow up shortly.</p>
-          <div class="confirm-details" id="confirmDetails"></div>
-          <button onclick="resetModal()" style="background:var(--teal);color:white;border:none;padding:0.7rem 1.5rem;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer">Book another</button>
-        </div>
-
-      </div>
-
-      <div class="modal-footer" id="modalFooter">
-        <span class="note">🔒 Secure & private</span>
-        <button class="modal-submit" id="modalSubmit" onclick="submitBooking()">Confirm Booking →</button>
-      </div>
-    </div>
   </div>
 
   <!-- FOOTER -->
@@ -615,8 +428,6 @@
 
     let allProviders = [];
     let activeFilter = 'all';
-    let selectedProvider = null;
-    let selectedService = '';
 
     // ── Location Autocomplete ──
     let autocompleteTimer = null;
@@ -641,7 +452,7 @@
     });
 
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-field')) dropdown.classList.remove('visible');
+      if (!e.target.closest('.pill-segment')) dropdown.classList.remove('visible');
     });
 
     async function fetchLocations(query) {
@@ -662,7 +473,7 @@
         dropdown.innerHTML = `<div class="autocomplete-loading">No results found</div>`;
         return;
       }
-      dropdown.innerHTML = results.map((r, i) => {
+      dropdown.innerHTML = results.map((r) => {
         const addr = r.address;
         const city    = addr.city || addr.town || addr.village || addr.county || '';
         const state   = addr.state || '';
@@ -697,55 +508,6 @@
       btn.href = '/account/';
     }
 
-    // Set min date
-    document.getElementById('apptDate').setAttribute('min', new Date().toISOString().split('T')[0]);
-
-    // Service autocomplete
-    const serviceOptions = [
-      { icon: '🩺', label: 'Wellness Checkup' },
-      { icon: '💉', label: 'Vaccination' },
-      { icon: '🦷', label: 'Dental Cleaning' },
-      { icon: '🔬', label: 'Surgery Consult' },
-      { icon: '🤒', label: 'Sick Visit' },
-      { icon: '✂️', label: 'Grooming' },
-      { icon: '🎓', label: 'Training Session' },
-      { icon: '🦮', label: 'Dog Walk' },
-      { icon: '🏠', label: 'Boarding' },
-      { icon: '📋', label: 'Follow-up' },
-    ];
-
-    const serviceInput = document.getElementById('serviceInput');
-    const serviceSuggestions = document.getElementById('serviceSuggestions');
-
-    function renderServiceSuggestions(query) {
-      const filtered = query
-        ? serviceOptions.filter(o => o.label.toLowerCase().includes(query.toLowerCase()))
-        : serviceOptions;
-      if (!filtered.length) { serviceSuggestions.classList.remove('visible'); return; }
-      serviceSuggestions.innerHTML = filtered.map(o =>
-        `<div class="suggestion-item" onmousedown="selectService('${o.label}')">
-          <span class="s-icon">${o.icon}</span>
-          <span class="s-label">${o.label}</span>
-        </div>`
-      ).join('');
-      serviceSuggestions.classList.add('visible');
-    }
-
-    serviceInput.addEventListener('focus', () => renderServiceSuggestions(serviceInput.value));
-    serviceInput.addEventListener('input', () => {
-      selectedService = serviceInput.value.trim();
-      renderServiceSuggestions(serviceInput.value);
-    });
-    serviceInput.addEventListener('blur', () => {
-      setTimeout(() => serviceSuggestions.classList.remove('visible'), 150);
-    });
-
-    window.selectService = function(label) {
-      serviceInput.value = label;
-      selectedService = label;
-      serviceSuggestions.classList.remove('visible');
-    };
-
     // Load providers
     async function loadProviders() {
       const { data, error } = await supabase
@@ -762,39 +524,37 @@
     }
 
     function renderProviders(providers) {
-      const grid = document.getElementById('providersGrid');
+      const grid  = document.getElementById('providersGrid');
       const title = document.getElementById('resultsTitle');
 
-      const loc = document.getElementById('searchLocation').value.trim();
+      const loc = locationInput.value.trim();
       const locLabel = loc ? ` near "${loc}"` : ' in Boston, MA';
-      title.innerHTML = `<strong>${providers.length} providers</strong><span>${locLabel}</span>`;
+      title.innerHTML = `<strong>${providers.length} providers</strong> ${locLabel}`;
 
       if (providers.length === 0) {
         grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No providers found</h3><p>Try a different filter or location</p></div>`;
         return;
       }
 
+      const typeLabels = { vet: 'Veterinarian', groomer: 'Groomer', walker: 'Dog Walker', trainer: 'Trainer', boarding: 'Boarding' };
+
       grid.innerHTML = providers.map(p => {
-        const stars = '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '');
-        const typeLabel = { vet: 'Veterinarian', groomer: 'Groomer', walker: 'Dog Walker', trainer: 'Trainer', boarding: 'Boarding' }[p.type] || p.type;
+        const rating    = p.rating.toFixed(1);
+        const stars     = '★'.repeat(Math.floor(p.rating));
+        const typeLabel = typeLabels[p.type] || p.type;
         return `
           <div class="provider-card" onclick="window.location.href='/provider.html?id=${p.id}'">
             <div class="card-banner banner-${p.type}">
-              <span class="type-badge badge-${p.type}">${typeLabel}</span>
+              <span class="card-type-pill badge-${p.type}">${typeLabel}</span>
               ${p.avatar}
             </div>
             <div class="card-body">
-              <div class="card-name">${p.name}</div>
-              <div class="card-specialty">${p.specialty}</div>
-              <div class="card-rating">
-                <span class="stars">${stars}</span>
-                ${p.rating} <span style="font-weight:400;color:var(--gray-500)">(${p.review_count} reviews)</span>
+              <div class="card-header-row">
+                <div class="card-name">${p.name}</div>
+                <div class="card-rating"><span class="stars">${stars}</span> ${rating}</div>
               </div>
-              <div class="card-meta">
-                <span>📍 ${p.neighborhood}, ${p.city}</span>
-              </div>
-              <div class="card-availability">🕐 Next: ${p.next_available}</div>
-              <button class="book-btn">View & Book</button>
+              <div class="card-location">${p.neighborhood}, ${p.city}</div>
+              <div class="card-avail">Next: ${p.next_available}</div>
             </div>
           </div>`;
       }).join('');
@@ -803,26 +563,25 @@
     // Filter logic
     window.setFilter = function(type, btn) {
       activeFilter = type;
-      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('searchType').value = type;
       applyFilters();
     };
 
     window.applyFilters = function() {
-      const type = document.getElementById('searchType').value;
-      const rawLoc = document.getElementById('searchLocation').value.trim().toLowerCase();
+      const type   = document.getElementById('searchType').value;
+      const rawLoc = locationInput.value.trim().toLowerCase();
 
-      // Sync pill with dropdown
-      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.filter-pill').forEach(b => {
+      // Sync category bar with dropdown
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.cat-btn').forEach(b => {
         if (b.getAttribute('onclick').includes(`'${type}'`)) b.classList.add('active');
       });
 
       let filtered = allProviders;
       if (type !== 'all') filtered = filtered.filter(p => p.type === type);
       if (rawLoc) {
-        // Use selected city from autocomplete if available, else raw text
         const locQuery = selectedLocation?.city?.toLowerCase() || rawLoc;
         filtered = filtered.filter(p =>
           p.city.toLowerCase().includes(locQuery) ||
@@ -832,86 +591,6 @@
         );
       }
       renderProviders(filtered);
-    };
-
-    // Modal
-    window.openModal = function(id) {
-      selectedProvider = allProviders.find(p => p.id === id);
-      if (!selectedProvider) return;
-      document.getElementById('modalAvatar').textContent       = selectedProvider.avatar;
-      document.getElementById('modalProviderName').textContent = selectedProvider.name;
-      document.getElementById('modalProviderMeta').textContent = `${selectedProvider.specialty} · ${selectedProvider.neighborhood}, ${selectedProvider.city}`;
-      document.getElementById('modalSubtitle').textContent     = `at ${selectedProvider.name}`;
-      document.getElementById('modalOverlay').classList.add('visible');
-      document.body.style.overflow = 'hidden';
-    };
-
-    window.closeModal = function() {
-      document.getElementById('modalOverlay').classList.remove('visible');
-      document.body.style.overflow = '';
-    };
-
-    window.closeModalOnOverlay = function(e) {
-      if (e.target === document.getElementById('modalOverlay')) closeModal();
-    };
-
-    window.submitBooking = async function() {
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName  = document.getElementById('lastName').value.trim();
-      const email     = document.getElementById('email').value.trim();
-      const petName   = document.getElementById('petName').value.trim();
-      const species   = document.getElementById('species').value;
-      const date      = document.getElementById('apptDate').value;
-      const time      = document.getElementById('apptTime').value;
-
-      if (!firstName || !lastName || !email || !petName || !species || !date || !time) {
-        alert('Please fill in all required fields.'); return;
-      }
-      if (!selectedService) { alert('Please select a type of visit.'); return; }
-
-      const btn = document.getElementById('modalSubmit');
-      btn.textContent = 'Saving…'; btn.disabled = true;
-
-      const { data: { session } } = await supabase.auth.getSession();
-      const { error } = await supabase.from('bookings').insert({
-        first_name: firstName, last_name: lastName, email,
-        phone: document.getElementById('phone').value,
-        pet_name: petName, species,
-        breed: document.getElementById('breed').value,
-        age: document.getElementById('age').value,
-        clinic: selectedProvider.name,
-        service_type: selectedService,
-        appointment_date: date, appointment_time: time,
-        notes: document.getElementById('notes').value,
-        user_id: session?.user?.id || null
-      });
-
-      btn.textContent = 'Confirm Booking →'; btn.disabled = false;
-      if (error) { alert('Something went wrong. Please try again.'); return; }
-
-      const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-        weekday: 'long', month: 'long', day: 'numeric'
-      });
-      document.getElementById('confirmDetails').innerHTML = `
-        <div class="confirm-row"><span class="lbl">Provider</span><span class="val">${selectedProvider.name}</span></div>
-        <div class="confirm-row"><span class="lbl">Pet</span><span class="val">${petName}</span></div>
-        <div class="confirm-row"><span class="lbl">Service</span><span class="val">${selectedService}</span></div>
-        <div class="confirm-row"><span class="lbl">Date</span><span class="val">${formattedDate}</span></div>
-        <div class="confirm-row"><span class="lbl">Time</span><span class="val">${time}</span></div>
-      `;
-      document.getElementById('modalForm').classList.add('hidden');
-      document.getElementById('modalFooter').style.display = 'none';
-      document.getElementById('modalConfirm').classList.add('visible');
-    };
-
-    window.resetModal = function() {
-      document.getElementById('modalForm').classList.remove('hidden');
-      document.getElementById('modalFooter').style.display = '';
-      document.getElementById('modalConfirm').classList.remove('visible');
-      document.getElementById('modalOverlay').classList.remove('visible');
-      document.body.style.overflow = '';
-      document.getElementById('serviceInput').value = '';
-      selectedService = '';
     };
 
     loadProviders();
