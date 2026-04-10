@@ -200,12 +200,38 @@
       cursor: pointer;
     }
 
-    /* Two-col row */
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 80px;
-      gap: 0.75rem;
+    /* Address autocomplete */
+    .address-wrap { position: relative; }
+    .address-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 16px 40px rgba(0,0,0,0.14);
+      border: 1px solid var(--gray-200);
+      z-index: 999;
+      overflow: hidden;
+      display: none;
     }
+    .address-dropdown.visible { display: block; }
+    .address-item {
+      padding: 0.8rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      transition: background 0.1s;
+    }
+    .address-item:hover { background: var(--gray-50); }
+    .address-item-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: var(--gray-100); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+    .address-item-name { font-weight: 600; color: var(--gray-900); line-height: 1.2; font-size: 0.875rem; }
+    .address-item-detail { font-size: 0.76rem; color: var(--gray-500); margin-top: 1px; }
+    .address-loading { padding: 0.9rem 1rem; font-size: 0.85rem; color: var(--gray-500); }
 
     .submit-btn {
       width: 100%;
@@ -377,17 +403,10 @@
             <input type="text" id="specialty" placeholder="e.g. Small animals &amp; exotic pets" required />
           </div>
           <div class="form-group">
-            <label for="address">Street Address</label>
-            <input type="text" id="address" placeholder="123 Main St" required />
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="margin-bottom:0">
-              <label for="city">City</label>
-              <input type="text" id="city" placeholder="Boston" required />
-            </div>
-            <div class="form-group" style="margin-bottom:0">
-              <label for="state">State</label>
-              <input type="text" id="state" placeholder="MA" value="MA" required />
+            <label for="addressInput">Business Address</label>
+            <div class="address-wrap">
+              <input type="text" id="addressInput" placeholder="Start typing your address…" autocomplete="off" required />
+              <div class="address-dropdown" id="addressDropdown"></div>
             </div>
           </div>
           <div class="form-group" style="margin-top:1.1rem">
@@ -472,6 +491,78 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    // ── Mapbox address autocomplete ──────────────────────
+    const MAPBOX_TOKEN = ['pk.eyJ1IjoidGltYWxwZXJz','IiwiYSI6ImNtbnNiaDkyYjBiNG4z','Mm9kNzFzZmJsdXoifQ.6OvuYWuuO_jJc1PpHuvm2g'].join('');
+    let selectedAddress = null;
+    let addrTimer = null;
+
+    const addrInput    = document.getElementById('addressInput');
+    const addrDropdown = document.getElementById('addressDropdown');
+
+    addrInput.addEventListener('input', () => {
+      const q = addrInput.value.trim();
+      clearTimeout(addrTimer);
+      selectedAddress = null;
+      if (q.length < 3) { addrDropdown.classList.remove('visible'); return; }
+      addrDropdown.innerHTML = '<div class="address-loading">🔍 Searching…</div>';
+      addrDropdown.classList.add('visible');
+      addrTimer = setTimeout(() => fetchAddresses(q), 350);
+    });
+
+    addrInput.addEventListener('keydown', e => {
+      if (e.key === 'Escape') addrDropdown.classList.remove('visible');
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.address-wrap')) addrDropdown.classList.remove('visible');
+    });
+
+    async function fetchAddresses(q) {
+      try {
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json` +
+          `?access_token=${MAPBOX_TOKEN}&country=us&types=address,poi&limit=5&language=en`
+        );
+        const data = await res.json();
+        renderAddressDropdown(data.features || []);
+      } catch { addrDropdown.classList.remove('visible'); }
+    }
+
+    function renderAddressDropdown(features) {
+      if (!features.length) {
+        addrDropdown.innerHTML = '<div class="address-loading">No results found</div>';
+        return;
+      }
+      addrDropdown.innerHTML = features.map((f, i) => {
+        const name   = f.text;
+        const detail = f.place_name;
+        const icon   = f.place_type[0] === 'poi' ? '🏢' : '📍';
+        return `<div class="address-item" onmousedown="pickAddress(${i})">
+          <div class="address-item-icon">${icon}</div>
+          <div>
+            <div class="address-item-name">${name}</div>
+            <div class="address-item-detail">${detail}</div>
+          </div>
+        </div>`;
+      }).join('');
+      window._addrFeatures = features;
+    }
+
+    window.pickAddress = function(i) {
+      const f    = window._addrFeatures[i];
+      const ctx  = f.context || [];
+      const city  = ctx.find(c => c.id.startsWith('place'))?.text || '';
+      const state = ctx.find(c => c.id.startsWith('region'))?.text || '';
+      const neighborhood = ctx.find(c => c.id.startsWith('neighborhood') || c.id.startsWith('locality'))?.text || city;
+      const streetNum  = f.address || '';
+      const streetName = f.text || '';
+      const fullAddress = streetNum ? `${streetNum} ${streetName}` : f.place_name.split(',')[0];
+
+      selectedAddress = { address: fullAddress, city, state, neighborhood };
+      addrInput.value = f.place_name;
+      addrDropdown.classList.remove('visible');
+    };
+
     // ── Step 2: Submit ───────────────────────────────────
     document.getElementById('submitBtn').addEventListener('click', async () => {
       clearError();
@@ -479,19 +570,16 @@
       const businessName = document.getElementById('businessName').value.trim();
       const serviceType  = document.getElementById('serviceType').value;
       const specialty    = document.getElementById('specialty').value.trim();
-      const address      = document.getElementById('address').value.trim();
-      const city         = document.getElementById('city').value.trim();
-      const state        = document.getElementById('state').value.trim();
       const bio          = document.getElementById('bio').value.trim();
 
       // Validate
-      if (!businessName) { showError('Please enter your business name.'); return; }
-      if (!serviceType)  { showError('Please select a type of service.'); return; }
-      if (!specialty)    { showError('Please enter a specialty / tagline.'); return; }
-      if (!address)      { showError('Please enter your street address.'); return; }
-      if (!city)         { showError('Please enter your city.'); return; }
-      if (!state)        { showError('Please enter your state.'); return; }
-      if (!bio)          { showError('Please enter a bio.'); return; }
+      if (!businessName)    { showError('Please enter your business name.'); return; }
+      if (!serviceType)     { showError('Please select a type of service.'); return; }
+      if (!specialty)       { showError('Please enter a specialty / tagline.'); return; }
+      if (!selectedAddress) { showError('Please select an address from the suggestions.'); return; }
+      if (!bio)             { showError('Please enter a bio.'); return; }
+
+      const { address, city, state, neighborhood } = selectedAddress;
 
       // Pull account fields from step 1
       const fullName = document.getElementById('fullName').value.trim();
@@ -532,7 +620,7 @@
           address,
           city,
           state,
-          neighborhood: city,
+          neighborhood,
           bio,
           avatar: avatarEmojis[serviceType] || '🐾',
           rating: 0,
