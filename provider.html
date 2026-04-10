@@ -696,10 +696,13 @@
         phone: document.getElementById('phone').value,
         pet_name: petName, species,
         breed: document.getElementById('breed').value,
-        clinic: provider.name, service_type: service,
+        clinic: provider.name,       // keep for backward compat
+        provider_id: provider.id,    // FK reference
+        service_type: service,
         appointment_date: apptDate, appointment_time: selectedTime,
         notes: document.getElementById('notes').value,
         user_id: session?.user?.id || null,
+        owner_id: session?.user?.id || null,  // FK reference
       });
 
       btn.textContent = 'Confirm Booking →'; btn.disabled = false;

@@ -178,11 +178,11 @@
     const displayName = profile?.full_name || session.user.email;
     document.getElementById('userName').textContent = '👤 ' + displayName;
 
-    // Load bookings by email
+    // Load bookings — use owner_id FK if available, fall back to email match
     const { data: bookings } = await supabase
       .from('bookings')
       .select('*')
-      .eq('email', session.user.email)
+      .or(`owner_id.eq.${session.user.id},email.eq.${session.user.email}`)
       .order('appointment_date', { ascending: true });
 
     const today = new Date().toISOString().split('T')[0];

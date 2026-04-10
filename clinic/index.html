@@ -279,13 +279,16 @@
     clinicName = profile.clinic_name || 'Your Clinic';
     document.getElementById('clinicBadge').textContent = '🏥 ' + clinicName;
 
-    // Load bookings for this clinic
+    // Load bookings for this clinic — use provider_id FK if available, fall back to name
     async function loadBookings() {
-      const { data, error } = await supabase
+      const query = supabase
         .from('bookings')
         .select('*')
-        .eq('clinic', clinicName)
         .order('appointment_date', { ascending: true });
+
+      const { data, error } = profile.provider_id
+        ? await query.eq('provider_id', profile.provider_id)
+        : await query.eq('clinic', clinicName);
 
       allBookings = data || [];
       renderBookings(allBookings);
