@@ -510,9 +510,11 @@
     // Update nav if logged in
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
       const btn = document.getElementById('navLoginBtn');
-      btn.textContent = 'My Account';
-      btn.href = '/account/';
+      if (profile?.role === 'admin')       { btn.textContent = '⚡ Admin';      btn.href = '/admin/'; }
+      else if (profile?.role === 'clinic') { btn.textContent = 'Dashboard';     btn.href = '/clinic/'; }
+      else                                 { btn.textContent = 'My Account';    btn.href = '/account/'; }
     }
 
     // Load providers
