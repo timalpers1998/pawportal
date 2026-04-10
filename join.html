@@ -233,6 +233,30 @@
     .address-item-detail { font-size: 0.76rem; color: var(--gray-500); margin-top: 1px; }
     .address-loading { padding: 0.9rem 1rem; font-size: 0.85rem; color: var(--gray-500); }
 
+    /* Services selector */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .service-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .service-checkbox:hover { border-color: var(--teal); color: var(--gray-900); }
+    .service-checkbox input[type="checkbox"] { accent-color: var(--teal); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+    .service-checkbox.checked { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+
     .submit-btn {
       width: 100%;
       background: var(--teal);
@@ -389,7 +413,7 @@
           </div>
           <div class="form-group">
             <label for="serviceType">Type of Service</label>
-            <select id="serviceType" required>
+            <select id="serviceType" onchange="renderServices(this.value)" required>
               <option value="" disabled selected>Select a service type…</option>
               <option value="vet">Veterinarian</option>
               <option value="groomer">Groomer</option>
@@ -398,8 +422,12 @@
               <option value="boarding">Boarding</option>
             </select>
           </div>
+          <div class="form-group" id="servicesGroup" style="display:none">
+            <label>Services Offered <span style="color:var(--gray-500);font-weight:400">(select all that apply)</span></label>
+            <div class="services-grid" id="servicesGrid"></div>
+          </div>
           <div class="form-group">
-            <label for="specialty">Specialty</label>
+            <label for="specialty">Tagline</label>
             <input type="text" id="specialty" placeholder="e.g. Small animals &amp; exotic pets" required />
           </div>
           <div class="form-group">
@@ -491,6 +519,32 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    // ── Services master list ─────────────────────────────
+    const MASTER_SERVICES = {
+      vet:      ['Wellness Exam', 'Vaccinations', 'Dental Cleaning', 'Surgery', 'Sick Visit', 'Emergency Care', 'Spay & Neuter', 'X-Ray & Imaging', 'Lab Tests', 'Microchipping', 'Prescription Medications', 'Behavioral Consultation'],
+      groomer:  ['Full Groom', 'Bath & Brush', 'Nail Trim', 'Ear Cleaning', 'Teeth Brushing', 'De-shedding Treatment', 'Breed-Specific Styling', 'Puppy First Groom', 'Senior Pet Groom', 'Flea Treatment'],
+      walker:   ['30-min Walk', '60-min Walk', 'Group Walk', 'Solo Walk', 'Drop-in Visit', 'Running', 'Off-Leash Play', 'Puppy Walks', 'Overnight Check-in'],
+      trainer:  ['Puppy Training', 'Basic Obedience', 'Advanced Obedience', 'Behavior Modification', 'Agility Training', 'Group Classes', 'Private Sessions', 'Board & Train', 'Anxiety & Reactivity'],
+      boarding: ['Overnight Stay', 'Daycare', 'Weekend Stay', 'Extended Stay', 'Solo Room', 'Group Play', 'Medication Administration', 'Special Needs Care', 'Puppy Boarding'],
+    };
+
+    window.renderServices = function(type) {
+      const services = MASTER_SERVICES[type] || [];
+      const group = document.getElementById('servicesGroup');
+      const grid  = document.getElementById('servicesGrid');
+      if (!services.length) { group.style.display = 'none'; return; }
+      group.style.display = 'block';
+      grid.innerHTML = services.map(s => `
+        <label class="service-checkbox" onclick="this.classList.toggle('checked')">
+          <input type="checkbox" name="service" value="${s}" />
+          ${s}
+        </label>`).join('');
+    };
+
+    function getSelectedServices() {
+      return [...document.querySelectorAll('#servicesGrid input[type="checkbox"]:checked')].map(c => c.value);
+    }
+
     // ── Mapbox address autocomplete ──────────────────────
     const MAPBOX_TOKEN = ['pk.eyJ1IjoidGltYWxwZXJz','IiwiYSI6ImNtbnNiaDkyYjBiNG4z','Mm9kNzFzZmJsdXoifQ.6OvuYWuuO_jJc1PpHuvm2g'].join('');
     let selectedAddress = null;
@@ -579,6 +633,8 @@
       if (!selectedAddress) { showError('Please select an address from the suggestions.'); return; }
       if (!bio)             { showError('Please enter a bio.'); return; }
 
+      const selectedServices = getSelectedServices();
+
       const { address, city, state, neighborhood } = selectedAddress;
 
       // Pull account fields from step 1
@@ -627,6 +683,7 @@
           review_count: 0,
           next_available: 'By appointment',
           contact_email: email,
+          services: selectedServices,
         })
         .select()
         .single();

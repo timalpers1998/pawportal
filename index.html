@@ -281,6 +281,7 @@
       flex-shrink: 0;
     }
     .stars { color: #f59e0b; font-size: 0.78rem; }
+    .card-new { background: var(--teal-light); color: var(--teal-dark); font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; }
     .card-location { font-size: 0.82rem; color: var(--gray-500); margin-bottom: 1px; }
     .card-avail { font-size: 0.82rem; color: var(--gray-500); }
 
@@ -549,9 +550,13 @@
       const typeLabels = { vet: 'Veterinarian', groomer: 'Groomer', walker: 'Dog Walker', trainer: 'Trainer', boarding: 'Boarding' };
 
       grid.innerHTML = providers.map(p => {
-        const rating    = p.rating.toFixed(1);
-        const stars     = '★'.repeat(Math.floor(p.rating));
-        const typeLabel = typeLabels[p.type] || p.type;
+        const typeLabel  = typeLabels[p.type] || p.type;
+        const hasRating  = p.rating > 0 && p.review_count > 0;
+        const ratingHtml = hasRating
+          ? `<div class="card-rating"><span class="stars">★</span> ${p.rating.toFixed(1)}</div>`
+          : `<div class="card-rating card-new">New</div>`;
+        const loc = p.neighborhood && p.neighborhood !== p.city
+          ? `${p.neighborhood}, ${p.city}` : p.city;
         return `
           <div class="provider-card" onclick="window.location.href='/provider.html?id=${p.id}'">
             <div class="card-banner banner-${p.type}">
@@ -561,9 +566,9 @@
             <div class="card-body">
               <div class="card-header-row">
                 <div class="card-name">${p.name}</div>
-                <div class="card-rating"><span class="stars">${stars}</span> ${rating}</div>
+                ${ratingHtml}
               </div>
-              <div class="card-location">${p.neighborhood}, ${p.city}</div>
+              <div class="card-location">${loc}${p.state ? ', ' + p.state : ''}</div>
               <div class="card-avail">Next: ${p.next_available}</div>
             </div>
           </div>`;
