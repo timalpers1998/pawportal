@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawPortal — Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-light: #ccfbf1;
+      --orange: #f97316;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--teal);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--teal);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .nav-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .admin-badge {
+      background: #7c3aed;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logout-btn {
+      background: none;
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-700);
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: #dc2626; color: #dc2626; }
+
+    /* MAIN */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; }
+    .page-header p { color: var(--gray-500); margin-top: 0.3rem; }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--gray-900);
+    }
+    .stat-card.highlight {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .stat-card.highlight .stat-label { color: rgba(255,255,255,0.7); }
+    .stat-card.highlight .stat-value { color: white; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.4rem 1rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: white;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active {
+      background: var(--gray-900);
+      border-color: var(--gray-900);
+      color: white;
+    }
+
+    /* TABLE */
+    .table-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--gray-50); }
+    th {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    td {
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+
+    .business-name { font-weight: 600; color: var(--gray-900); }
+    .business-email { font-size: 0.78rem; color: var(--gray-500); margin-top: 1px; }
+
+    .bio-cell {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--gray-500);
+      font-size: 0.85rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-pending  { background: #f3e8ff; color: #6b21a8; }
+    .status-approved { background: #dcfce7; color: #166534; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+
+    .action-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .action-btn {
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    .action-btn:hover { opacity: 0.8; }
+    .btn-approve { background: #dcfce7; color: #166534; }
+    .btn-reject  { background: #fee2e2; color: #991b1b; }
+    .btn-revoke  { background: var(--gray-100); color: var(--gray-700); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray-500);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.3rem; }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: var(--gray-500);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .nav-center { display: none; }
+      table { display: block; overflow-x: auto; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-icon">🐾</div>
+      PawPortal
+    </a>
+    <div class="nav-center">
+      <span class="admin-badge">⚡ Admin</span>
+    </div>
+    <div class="nav-right">
+      <button class="logout-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Clinic Applications</h1>
+      <p>Review and approve providers applying to join PawPortal</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-value" id="statPending">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Approved</div>
+        <div class="stat-value" id="statApproved">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rejected</div>
+        <div class="stat-value" id="statRejected">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Applications</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProviders('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProviders('pending', this)">Pending</button>
+      <button class="filter-btn" onclick="filterProviders('approved', this)">Approved</button>
+      <button class="filter-btn" onclick="filterProviders('rejected', this)">Rejected</button>
+    </div>
+
+    <div class="table-card">
+      <div class="loading" id="loadingState">Loading applications…</div>
+      <table id="providersTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Business</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Bio</th>
+            <th>Applied</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="providersBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="icon">📭</div>
+        <h3>No applications found</h3>
+        <p>Applications matching this filter will appear here</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase } from '/js/supabase.js';
+
+    const typeLabels = {
+      vet: 'Veterinarian',
+      groomer: 'Groomer',
+      walker: 'Dog Walker',
+      trainer: 'Trainer',
+      boarding: 'Boarding'
+    };
+
+    let allProviders = [];
+
+    // Auth guard
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = '/login.html'; }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
+      window.location.href = '/';
+    }
+
+    // Load all providers
+    async function loadProviders() {
+      const { data } = await supabase
+        .from('providers')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      allProviders = data || [];
+      updateStats(allProviders);
+      renderProviders(allProviders);
+      document.getElementById('loadingState').style.display = 'none';
+    }
+
+    function updateStats(providers) {
+      document.getElementById('statPending').textContent  = providers.filter(p => p.status === 'pending').length;
+      document.getElementById('statApproved').textContent = providers.filter(p => p.status === 'approved').length;
+      document.getElementById('statRejected').textContent = providers.filter(p => p.status === 'rejected').length;
+      document.getElementById('statTotal').textContent    = providers.length;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function renderProviders(providers) {
+      const tbody = document.getElementById('providersBody');
+      const table = document.getElementById('providersTable');
+      const empty = document.getElementById('emptyState');
+
+      if (providers.length === 0) {
+        table.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+
+      table.style.display = 'table';
+      empty.style.display = 'none';
+
+      tbody.innerHTML = providers.map(p => {
+        const typeLabel = typeLabels[p.type] || p.type || '—';
+        const location  = [p.neighborhood, p.city, p.state].filter(Boolean).join(', ') || '—';
+        const bio       = p.bio || p.description || '';
+        const applied   = formatDate(p.created_at);
+        const status    = p.status || 'pending';
+
+        let actions = '';
+        if (status === 'pending') {
+          actions = `
+            <button class="action-btn btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve ✓</button>
+            <button class="action-btn btn-reject"  onclick="updateStatus('${p.id}', 'rejected')">Reject ✗</button>`;
+        } else if (status === 'approved') {
+          actions = `<button class="action-btn btn-revoke" onclick="updateStatus('${p.id}', 'rejected')">Revoke</button>`;
+        } else if (status === 'rejected') {
+          actions = `<button class="action-btn btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve ✓</button>`;
+        }
+
+        return `<tr>
+          <td>
+            <div class="business-name">${p.name || '—'}</div>
+            ${p.email ? `<div class="business-email">${p.email}</div>` : ''}
+          </td>
+          <td>${typeLabel}</td>
+          <td>${location}</td>
+          <td><div class="bio-cell" title="${bio.replace(/"/g, '&quot;')}">${bio || '—'}</div></td>
+          <td>${applied}</td>
+          <td><span class="status-badge status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
+          <td><div class="action-btns">${actions}</div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.updateStatus = async function(id, status) {
+      await supabase.from('providers').update({ status }).eq('id', id);
+      await loadProviders();
+    };
+
+    window.filterProviders = function(filter, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = filter === 'all' ? allProviders : allProviders.filter(p => (p.status || 'pending') === filter);
+      renderProviders(filtered);
+    };
+
+    window.signOut = async function() {
+      await supabase.auth.signOut();
+      window.location.href = '/login.html';
+    };
+
+    loadProviders();
+  </script>
+
+</body>
+</html>

@@ -513,6 +513,7 @@
       const { data, error } = await supabase
         .from('providers')
         .select('*')
+        .eq('status', 'approved')
         .order('rating', { ascending: false });
 
       if (error || !data) {

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawPortal — Join as a Clinic</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-light: #ccfbf1;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--teal);
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .nav-signin {
+      background: none;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9px;
+      padding: 0.45rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-signin:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    /* ── Page layout ── */
+    .page {
+      display: flex;
+      justify-content: center;
+      padding: 3rem 1rem 4rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    /* ── Step indicator ── */
+    .step-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .step-header h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 1.5rem;
+    }
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-shrink: 0;
+    }
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .step-circle.active {
+      background: var(--teal);
+      color: white;
+    }
+    .step-circle.completed {
+      background: var(--teal);
+      color: white;
+    }
+    .step-circle.inactive {
+      background: var(--gray-100);
+      color: var(--gray-500);
+      border: 1.5px solid var(--gray-200);
+    }
+    .step-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .step-label.active { color: var(--teal); }
+    .step-label.completed { color: var(--teal); }
+    .step-label.inactive { color: var(--gray-500); }
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--gray-200);
+      margin: 0 0.75rem;
+      transition: background 0.3s;
+    }
+    .step-connector.completed {
+      background: var(--teal);
+    }
+
+    /* ── Form body ── */
+    .form-body {
+      padding: 1.8rem 2rem 2rem;
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.1rem;
+    }
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    input, select, textarea {
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      color: var(--gray-900);
+      background: var(--gray-50);
+      transition: all 0.2s;
+      font-family: inherit;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+      background: white;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+
+    /* Two-col row */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 80px;
+      gap: 0.75rem;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: var(--teal-dark);
+      transform: translateY(-1px);
+    }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1.1rem;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── Success screen ── */
+    #successScreen {
+      display: none;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    #successScreen.visible { display: block; }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--teal);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+    }
+    .success-heading {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 0.75rem;
+    }
+    .success-subtext {
+      font-size: 0.95rem;
+      color: var(--gray-500);
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto 2rem;
+    }
+    .home-link {
+      display: inline-block;
+      background: var(--teal);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .home-link:hover {
+      background: var(--teal-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      nav { padding: 0 1rem; }
+      .page { padding: 1.5rem 0.75rem 3rem; }
+      .step-header { padding: 1.5rem 1.25rem 1.25rem; }
+      .form-body { padding: 1.5rem 1.25rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr 1fr; }
+      .form-row .state-group { grid-column: span 2; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-icon">🐾</span>
+      PawPortal
+    </a>
+    <a href="/login.html" class="nav-signin">Sign In</a>
+  </nav>
+
+  <!-- Page -->
+  <div class="page">
+    <div class="card">
+
+      <!-- Step indicator -->
+      <div class="step-header">
+        <h1>Join PawPortal</h1>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-circle active" id="stepCircle1">1</div>
+            <span class="step-label active" id="stepLabel1">Account</span>
+          </div>
+          <div class="step-connector" id="stepConnector"></div>
+          <div class="step-item">
+            <div class="step-circle inactive" id="stepCircle2">2</div>
+            <span class="step-label inactive" id="stepLabel2">Business Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form body -->
+      <div class="form-body">
+
+        <!-- Error message -->
+        <div class="error-msg" id="errorMsg"></div>
+
+        <!-- Step 1: Account -->
+        <div class="form-section active" id="step1">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Jane Smith" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="At least 8 characters" required />
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Repeat your password" required />
+          </div>
+          <button class="submit-btn" id="continueBtn" type="button">Continue →</button>
+        </div>
+
+        <!-- Step 2: Business Profile -->
+        <div class="form-section" id="step2">
+          <div class="form-group">
+            <label for="businessName">Business Name</label>
+            <input type="text" id="businessName" placeholder="Boston Animal Hospital" required />
+          </div>
+          <div class="form-group">
+            <label for="serviceType">Type of Service</label>
+            <select id="serviceType" required>
+              <option value="" disabled selected>Select a service type…</option>
+              <option value="vet">Veterinarian</option>
+              <option value="groomer">Groomer</option>
+              <option value="walker">Dog Walker</option>
+              <option value="trainer">Trainer</option>
+              <option value="boarding">Boarding</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="specialty">Specialty</label>
+            <input type="text" id="specialty" placeholder="e.g. Small animals &amp; exotic pets" required />
+          </div>
+          <div class="form-group">
+            <label for="address">Street Address</label>
+            <input type="text" id="address" placeholder="123 Main St" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label for="city">City</label>
+              <input type="text" id="city" placeholder="Boston" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label for="state">State</label>
+              <input type="text" id="state" placeholder="MA" value="MA" required />
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:1.1rem">
+            <label for="bio">Bio</label>
+            <textarea id="bio" placeholder="Tell pet owners about your practice, experience, and approach…" required></textarea>
+          </div>
+          <button class="submit-btn" id="submitBtn" type="button">Submit Application →</button>
+        </div>
+
+      </div><!-- /form-body -->
+
+      <!-- Success screen -->
+      <div id="successScreen">
+        <div class="success-icon">✅</div>
+        <div class="success-heading">Application submitted!</div>
+        <p class="success-subtext">
+          We'll review your listing and notify you within 24 hours.
+          Once approved, your profile will appear on PawPortal.
+        </p>
+        <a href="/" class="home-link">← Back to home</a>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+  <script type="module">
+    import { supabase } from '/js/supabase.js';
+
+    // ── Helpers ──────────────────────────────────────────
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+    function clearError() {
+      document.getElementById('errorMsg').classList.remove('visible');
+    }
+
+    // ── Step indicator ───────────────────────────────────
+    function setStepActive(step) {
+      const circle1 = document.getElementById('stepCircle1');
+      const label1  = document.getElementById('stepLabel1');
+      const connector = document.getElementById('stepConnector');
+      const circle2 = document.getElementById('stepCircle2');
+      const label2  = document.getElementById('stepLabel2');
+
+      if (step === 1) {
+        circle1.className = 'step-circle active';
+        circle1.textContent = '1';
+        label1.className = 'step-label active';
+        connector.className = 'step-connector';
+        circle2.className = 'step-circle inactive';
+        circle2.textContent = '2';
+        label2.className = 'step-label inactive';
+      } else {
+        circle1.className = 'step-circle completed';
+        circle1.textContent = '✓';
+        label1.className = 'step-label completed';
+        connector.className = 'step-connector completed';
+        circle2.className = 'step-circle active';
+        circle2.textContent = '2';
+        label2.className = 'step-label active';
+      }
+    }
+
+    // ── Step 1: Continue ─────────────────────────────────
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      clearError();
+
+      const fullName       = document.getElementById('fullName').value.trim();
+      const email          = document.getElementById('email').value.trim();
+      const password       = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!fullName) { showError('Please enter your full name.'); return; }
+      if (!email)    { showError('Please enter your email address.'); return; }
+      if (!password) { showError('Please enter a password.'); return; }
+      if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
+      if (password !== confirmPassword) { showError('Passwords do not match.'); return; }
+
+      // Transition
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+      setStepActive(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ── Step 2: Submit ───────────────────────────────────
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      clearError();
+
+      const businessName = document.getElementById('businessName').value.trim();
+      const serviceType  = document.getElementById('serviceType').value;
+      const specialty    = document.getElementById('specialty').value.trim();
+      const address      = document.getElementById('address').value.trim();
+      const city         = document.getElementById('city').value.trim();
+      const state        = document.getElementById('state').value.trim();
+      const bio          = document.getElementById('bio').value.trim();
+
+      // Validate
+      if (!businessName) { showError('Please enter your business name.'); return; }
+      if (!serviceType)  { showError('Please select a type of service.'); return; }
+      if (!specialty)    { showError('Please enter a specialty / tagline.'); return; }
+      if (!address)      { showError('Please enter your street address.'); return; }
+      if (!city)         { showError('Please enter your city.'); return; }
+      if (!state)        { showError('Please enter your state.'); return; }
+      if (!bio)          { showError('Please enter a bio.'); return; }
+
+      // Pull account fields from step 1
+      const fullName = document.getElementById('fullName').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      // 1. Create auth account
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (authError) {
+        showError(authError.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit Application →';
+        return;
+      }
+
+      // 2. Create provider record
+      const avatarEmojis = {
+        vet: '🏥',
+        groomer: '✂️',
+        walker: '🦮',
+        trainer: '🎓',
+        boarding: '🏠',
+      };
+
+      const { data: provider, error: provErr } = await supabase
+        .from('providers')
+        .insert({
+          name: businessName,
+          type: serviceType,
+          specialty,
+          address,
+          city,
+          state,
+          neighborhood: city,
+          bio,
+          avatar: avatarEmojis[serviceType] || '🐾',
+          rating: 0,
+          review_count: 0,
+          next_available: 'By appointment',
+        })
+        .select()
+        .single();
+
+      if (provErr) {
+        showError(provErr.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit Application →';
+        return;
+      }
+
+      // 3. Create profile record linking user to provider
+      await supabase.from('profiles').insert({
+        id: authData.user.id,
+        role: 'clinic',
+        full_name: fullName,
+        clinic_name: businessName,
+        provider_id: provider.id,
+      });
+
+      // 4. Show success screen
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('errorMsg').classList.remove('visible');
+      document.querySelector('.step-header').style.display = 'none';
+      document.querySelector('.form-body').style.display = 'none';
+      const successScreen = document.getElementById('successScreen');
+      successScreen.classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

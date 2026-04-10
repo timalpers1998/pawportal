@@ -200,6 +200,12 @@
     </div>
   </nav>
 
+  <!-- Pending approval banner (hidden by default) -->
+  <div id="pendingBanner" style="display:none; background:#f3e8ff; border-bottom:1px solid #ddd6fe; padding:1rem 2rem; text-align:center;">
+    <strong style="color:#6b21a8">⏳ Your listing is pending review.</strong>
+    <span style="color:#7c3aed; margin-left:0.5rem; font-size:0.9rem">We'll notify you by email once approved — usually within 24 hours.</span>
+  </div>
+
   <main>
     <div class="page-header">
       <h1>Bookings Dashboard</h1>
@@ -278,6 +284,15 @@
 
     clinicName = profile.clinic_name || 'Your Clinic';
     document.getElementById('clinicBadge').textContent = '🏥 ' + clinicName;
+
+    // Check provider approval status
+    if (profile.provider_id) {
+      const { data: providerData } = await supabase
+        .from('providers').select('status').eq('id', profile.provider_id).single();
+      if (providerData?.status === 'pending') {
+        document.getElementById('pendingBanner').style.display = 'block';
+      }
+    }
 
     // Load bookings for this clinic — use provider_id FK if available, fall back to name
     async function loadBookings() {
