@@ -10,7 +10,6 @@
       --teal: #0d9488;
       --teal-dark: #0f766e;
       --teal-light: #ccfbf1;
-      --orange: #f97316;
       --gray-50: #f8fafc;
       --gray-100: #f1f5f9;
       --gray-200: #e2e8f0;
@@ -50,63 +49,37 @@
       border-radius: 20px;
       box-shadow: 0 25px 60px rgba(0,0,0,0.2);
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       overflow: hidden;
     }
-
-    /* Role selector */
-    .role-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    .role-btn {
-      padding: 1.1rem;
-      border: none;
-      background: var(--gray-50);
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--gray-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-      border-bottom: 3px solid transparent;
-    }
-    .role-btn:first-child { border-right: 1px solid var(--gray-200); }
-    .role-btn.active {
-      background: white;
-      color: var(--teal);
-      border-bottom-color: var(--teal);
-    }
-    .role-icon { font-size: 1.1rem; }
 
     /* Tabs */
     .tabs {
       display: flex;
-      padding: 1.5rem 2rem 0;
-      gap: 1.5rem;
       border-bottom: 1px solid var(--gray-200);
     }
     .tab {
-      padding-bottom: 0.75rem;
+      flex: 1;
+      padding: 1.2rem;
+      text-align: center;
       font-size: 0.95rem;
       font-weight: 600;
       color: var(--gray-500);
       cursor: pointer;
       border-bottom: 2px solid transparent;
       transition: all 0.2s;
+      background: var(--gray-50);
     }
+    .tab:first-child { border-right: 1px solid var(--gray-200); }
     .tab.active {
       color: var(--gray-900);
       border-bottom-color: var(--gray-900);
+      background: white;
     }
 
     /* Form */
-    .form-body { padding: 1.8rem 2rem; }
+    .form-body { padding: 1.8rem 2rem 1.5rem; }
+
     .form-group {
       display: flex;
       flex-direction: column;
@@ -127,6 +100,7 @@
       background: var(--gray-50);
       transition: all 0.2s;
       font-family: inherit;
+      width: 100%;
     }
     input:focus {
       outline: none;
@@ -134,6 +108,7 @@
       box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
       background: white;
     }
+
     .submit-btn {
       width: 100%;
       background: var(--teal);
@@ -145,28 +120,10 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
     }
     .submit-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    .divider {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--gray-500);
-      margin: 1rem 0;
-      position: relative;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 42%;
-      height: 1px;
-      background: var(--gray-200);
-    }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
 
     .error-msg {
       background: #fef2f2;
@@ -192,6 +149,22 @@
     }
     .success-msg.visible { display: block; }
 
+    /* Clinic CTA at bottom of card */
+    .clinic-cta {
+      border-top: 1px solid var(--gray-200);
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.83rem;
+      color: var(--gray-500);
+      background: var(--gray-50);
+    }
+    .clinic-cta a {
+      color: var(--teal);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .clinic-cta a:hover { text-decoration: underline; }
+
     .back-link {
       color: rgba(255,255,255,0.8);
       text-decoration: none;
@@ -203,8 +176,8 @@
     }
     .back-link:hover { color: white; }
 
-    .clinic-only { display: none; }
-    .clinic-only.visible { display: block; }
+    /* Show/hide fields */
+    .signup-only { display: none; }
   </style>
 </head>
 <body>
@@ -215,18 +188,6 @@
   </a>
 
   <div class="card">
-
-    <!-- Role selector -->
-    <div class="role-selector">
-      <button class="role-btn active" id="roleOwner" onclick="setRole('owner')">
-        <span class="role-icon">🐶</span> Pet Owner
-      </button>
-      <button class="role-btn" id="roleClinic" onclick="setRole('clinic')">
-        <span class="role-icon">🏥</span> Clinic
-      </button>
-    </div>
-
-    <!-- Sign in / Sign up tabs -->
     <div class="tabs">
       <div class="tab active" id="tabSignin" onclick="setTab('signin')">Sign In</div>
       <div class="tab" id="tabSignup" onclick="setTab('signup')">Create Account</div>
@@ -237,74 +198,74 @@
       <div class="success-msg" id="successMsg"></div>
 
       <form id="authForm">
-        <!-- Clinic name (signup only) -->
-        <div class="form-group clinic-only" id="clinicNameGroup">
-          <label>Clinic Name</label>
-          <input type="text" id="clinicName" placeholder="Boston Animal Hospital" />
-        </div>
-
-        <!-- Full name (signup only) -->
-        <div class="form-group" id="nameGroup" style="display:none">
+        <div class="form-group signup-only" id="nameGroup">
           <label>Full Name</label>
-          <input type="text" id="fullName" placeholder="Jane Smith" />
+          <input type="text" id="fullName" placeholder="Jane Smith" autocomplete="name" />
         </div>
 
         <div class="form-group">
           <label>Email Address</label>
-          <input type="email" id="email" placeholder="you@example.com" required />
+          <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
         </div>
 
         <div class="form-group">
           <label>Password</label>
-          <input type="password" id="password" placeholder="••••••••" required />
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
         </div>
 
         <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
       </form>
     </div>
+
+    <div class="clinic-cta">
+      Are you a clinic? <a href="/join.html">Apply to list your practice →</a>
+    </div>
   </div>
 
-  <a href="/" class="back-link">← Back to booking</a>
+  <a href="/" class="back-link">← Back to home</a>
 
   <script type="module">
     import { supabase } from '/js/supabase.js';
 
-    let currentRole = 'owner';
     let currentTab = 'signin';
 
-    window.setRole = function(role) {
-      currentRole = role;
-      document.getElementById('roleOwner').classList.toggle('active', role === 'owner');
-      document.getElementById('roleClinic').classList.toggle('active', role === 'clinic');
-      document.querySelectorAll('.clinic-only').forEach(el => {
-        el.classList.toggle('visible', role === 'clinic');
-      });
-      clearMessages();
-    };
+    // If already logged in, route immediately
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', session.user.id).single();
+      routeByRole(profile?.role);
+    }
+
+    function routeByRole(role) {
+      if (role === 'admin')  { window.location.href = '/admin/';   return; }
+      if (role === 'clinic') { window.location.href = '/clinic/';  return; }
+      window.location.href = '/account/';
+    }
 
     window.setTab = function(tab) {
       currentTab = tab;
       document.getElementById('tabSignin').classList.toggle('active', tab === 'signin');
       document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-      document.getElementById('nameGroup').style.display = tab === 'signup' ? 'flex' : 'none';
-      document.getElementById('submitBtn').textContent = tab === 'signin' ? 'Sign In' : 'Create Account';
+      const isSignup = tab === 'signup';
+      document.querySelectorAll('.signup-only').forEach(el => {
+        el.style.display = isSignup ? 'flex' : 'none';
+      });
+      document.getElementById('submitBtn').textContent = isSignup ? 'Create Account' : 'Sign In';
+      document.getElementById('password').autocomplete = isSignup ? 'new-password' : 'current-password';
       clearMessages();
     };
 
     function showError(msg) {
       const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.classList.add('visible');
+      el.textContent = msg; el.classList.add('visible');
       document.getElementById('successMsg').classList.remove('visible');
     }
-
     function showSuccess(msg) {
       const el = document.getElementById('successMsg');
-      el.textContent = msg;
-      el.classList.add('visible');
+      el.textContent = msg; el.classList.add('visible');
       document.getElementById('errorMsg').classList.remove('visible');
     }
-
     function clearMessages() {
       document.getElementById('errorMsg').classList.remove('visible');
       document.getElementById('successMsg').classList.remove('visible');
@@ -313,60 +274,54 @@
     document.getElementById('authForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Please wait…';
+      btn.disabled = true; btn.textContent = 'Please wait…';
       clearMessages();
 
-      const email = document.getElementById('email').value.trim();
+      const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
       if (currentTab === 'signin') {
+        // ── Sign In ──
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Sign In'; return; }
-
-        // Get role from profile
+        if (error) {
+          showError(error.message);
+          btn.disabled = false; btn.textContent = 'Sign In'; return;
+        }
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        const role = profile?.role;
-        if (role === 'clinic') window.location.href = '/clinic/';
-        else window.location.href = '/account/';
+          .from('profiles').select('role').eq('id', data.user.id).single();
+        routeByRole(profile?.role);
 
       } else {
-        // Sign up
+        // ── Create Account (pet owner) ──
         const fullName = document.getElementById('fullName').value.trim();
-        const clinicName = document.getElementById('clinicName').value.trim();
-
-        if (currentRole === 'clinic' && !clinicName) {
-          showError('Please enter your clinic name.');
+        if (!fullName) {
+          showError('Please enter your full name.');
+          btn.disabled = false; btn.textContent = 'Create Account'; return;
+        }
+        if (password.length < 8) {
+          showError('Password must be at least 8 characters.');
           btn.disabled = false; btn.textContent = 'Create Account'; return;
         }
 
         const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+        if (error) {
+          showError(error.message);
+          btn.disabled = false; btn.textContent = 'Create Account'; return;
+        }
 
-        // Save profile
+        // Create owner profile
         await supabase.from('profiles').insert({
           id: data.user.id,
-          role: currentRole,
+          role: 'owner',
           full_name: fullName,
-          clinic_name: currentRole === 'clinic' ? clinicName : null
         });
 
         showSuccess('Account created! Check your email to confirm, then sign in.');
-        btn.disabled = false;
-        btn.textContent = 'Create Account';
+        btn.disabled = false; btn.textContent = 'Create Account';
         setTab('signin');
       }
     });
   </script>
-
-  <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:var(--gray-500);">
-    Are you a new clinic? <a href="/join.html" style="color:var(--teal); font-weight:600;">Apply to join PawPortal →</a>
-  </p>
 
 </body>
 </html>
