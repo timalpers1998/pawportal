@@ -486,6 +486,9 @@
   <script type="module">
     import { supabase } from '/js/supabase.js';
 
+    (async () => {
+    try {
+
     // Auth nav
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -728,6 +731,12 @@
     // Show page
     document.getElementById('pageLoading').style.display = 'none';
     document.getElementById('providerContent').style.display = 'block';
+
+    } catch(e) {
+      document.getElementById('pageLoading').textContent = '⚠️ Error: ' + e.message;
+      console.error('Provider page error:', e);
+    }
+    })();
   </script>
 
 </body>
