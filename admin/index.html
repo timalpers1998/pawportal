@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PawPortal — Admin Panel</title>
+  <title>PawPortal — Admin</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --teal: #0d9488;
       --teal-dark: #0f766e;
       --teal-light: #ccfbf1;
-      --orange: #f97316;
+      --purple: #7c3aed;
+      --purple-light: #f3e8ff;
       --gray-50: #f8fafc;
       --gray-100: #f1f5f9;
       --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
       --gray-500: #64748b;
       --gray-700: #334155;
       --gray-900: #0f172a;
@@ -30,70 +32,35 @@
       background: white;
       border-bottom: 1px solid var(--gray-200);
       padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; position: sticky; top: 0; z-index: 100;
     }
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--teal);
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.2rem; font-weight: 700; color: var(--teal);
       text-decoration: none;
     }
     .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--teal);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-    }
-    .nav-center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      width: 32px; height: 32px; background: var(--teal);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-size: 1rem;
     }
     .admin-badge {
-      background: #7c3aed;
-      color: white;
-      padding: 0.3rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      background: var(--purple); color: white;
+      padding: 0.3rem 0.9rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
     }
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
     .logout-btn {
-      background: none;
-      border: 1.5px solid var(--gray-200);
-      color: var(--gray-700);
-      padding: 0.4rem 0.9rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: none; border: 1.5px solid var(--gray-200);
+      color: var(--gray-700); padding: 0.4rem 0.9rem;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
     }
     .logout-btn:hover { border-color: #dc2626; color: #dc2626; }
 
     /* MAIN */
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem;
-    }
+    main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
 
     .page-header { margin-bottom: 2rem; }
     .page-header h1 { font-size: 1.6rem; font-weight: 800; }
@@ -101,153 +68,115 @@
 
     /* STATS */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; margin-bottom: 2rem;
     }
     .stat-card {
-      background: white;
-      border: 1px solid var(--gray-200);
-      border-radius: 14px;
-      padding: 1.2rem 1.5rem;
+      background: white; border: 1px solid var(--gray-200);
+      border-radius: 14px; padding: 1.2rem 1.5rem;
     }
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--gray-500);
-      font-weight: 500;
-      margin-bottom: 0.4rem;
-    }
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--gray-900);
-    }
-    .stat-card.highlight {
-      background: #7c3aed;
-      border-color: #7c3aed;
-    }
+    .stat-label { font-size: 0.8rem; color: var(--gray-500); font-weight: 500; margin-bottom: 0.4rem; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--gray-900); }
+    .stat-card.highlight { background: var(--purple); border-color: var(--purple); }
     .stat-card.highlight .stat-label { color: rgba(255,255,255,0.7); }
     .stat-card.highlight .stat-value { color: white; }
 
+    /* SECTION TABS */
+    .section-tabs {
+      display: flex; gap: 0; border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 1.5rem;
+    }
+    .section-tab {
+      padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 600;
+      color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: all 0.15s;
+    }
+    .section-tab:hover { color: var(--gray-900); }
+    .section-tab.active { color: var(--gray-900); border-bottom-color: var(--gray-900); }
+
     /* FILTER BAR */
     .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.2rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 1.2rem; flex-wrap: wrap;
     }
     .filter-btn {
-      padding: 0.4rem 1rem;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      background: white;
-      color: var(--gray-700);
-      cursor: pointer;
+      padding: 0.4rem 1rem; border: 1.5px solid var(--gray-200);
+      border-radius: 999px; font-size: 0.85rem; font-weight: 500;
+      background: white; color: var(--gray-700); cursor: pointer;
       transition: all 0.15s;
     }
-    .filter-btn.active {
-      background: var(--gray-900);
-      border-color: var(--gray-900);
-      color: white;
-    }
+    .filter-btn.active { background: var(--gray-900); border-color: var(--gray-900); color: white; }
 
     /* TABLE */
     .table-card {
-      background: white;
-      border: 1px solid var(--gray-200);
-      border-radius: 16px;
-      overflow: hidden;
+      background: white; border: 1px solid var(--gray-200);
+      border-radius: 16px; overflow: hidden;
     }
     table { width: 100%; border-collapse: collapse; }
     thead { background: var(--gray-50); }
     th {
-      padding: 0.9rem 1.2rem;
-      text-align: left;
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--gray-500);
+      padding: 0.9rem 1.2rem; text-align: left;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--gray-500);
       border-bottom: 1px solid var(--gray-200);
     }
     td {
-      padding: 1rem 1.2rem;
-      font-size: 0.9rem;
-      border-bottom: 1px solid var(--gray-100);
-      vertical-align: middle;
+      padding: 1rem 1.2rem; font-size: 0.875rem;
+      border-bottom: 1px solid var(--gray-100); vertical-align: middle;
     }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--gray-50); }
 
-    .business-name { font-weight: 600; color: var(--gray-900); }
-    .business-email { font-size: 0.78rem; color: var(--gray-500); margin-top: 1px; }
+    .cell-primary { font-weight: 600; color: var(--gray-900); }
+    .cell-secondary { font-size: 0.78rem; color: var(--gray-500); margin-top: 2px; }
 
     .bio-cell {
-      max-width: 200px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: var(--gray-500);
-      font-size: 0.85rem;
+      max-width: 180px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+      color: var(--gray-500); font-size: 0.82rem;
     }
 
+    /* BADGES */
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.25rem 0.7rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
+      display: inline-flex; align-items: center;
+      padding: 0.2rem 0.65rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600; white-space: nowrap;
     }
-    .status-pending  { background: #f3e8ff; color: #6b21a8; }
+    .status-pending  { background: var(--purple-light); color: #6b21a8; }
     .status-approved { background: #dcfce7; color: #166534; }
     .status-rejected { background: #fee2e2; color: #991b1b; }
+    .role-owner  { background: var(--teal-light); color: var(--teal-dark); }
+    .role-clinic { background: #fef3c7; color: #92400e; }
+    .role-admin  { background: var(--purple-light); color: #6b21a8; }
 
-    .action-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    /* ACTIONS */
+    .action-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
     .action-btn {
-      padding: 0.3rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: opacity 0.2s;
-      white-space: nowrap;
+      padding: 0.3rem 0.7rem; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      border: none; transition: opacity 0.2s; white-space: nowrap;
     }
-    .action-btn:hover { opacity: 0.8; }
+    .action-btn:hover { opacity: 0.75; }
     .btn-approve { background: #dcfce7; color: #166534; }
     .btn-reject  { background: #fee2e2; color: #991b1b; }
     .btn-revoke  { background: var(--gray-100); color: var(--gray-700); }
+    .btn-make-admin { background: var(--purple-light); color: #6b21a8; }
+    .btn-remove-admin { background: var(--gray-100); color: var(--gray-700); }
 
-    /* Empty state */
     .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--gray-500);
+      text-align: center; padding: 4rem 2rem; color: var(--gray-500);
     }
     .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.3rem; }
 
-    /* Loading */
-    .loading {
-      text-align: center;
-      padding: 4rem;
-      color: var(--gray-500);
-      font-size: 0.9rem;
-    }
+    .loading { text-align: center; padding: 4rem; color: var(--gray-500); font-size: 0.9rem; }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
-      .nav-center { display: none; }
       table { display: block; overflow-x: auto; }
     }
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -258,9 +187,7 @@
       <div class="logo-icon">🐾</div>
       PawPortal
     </a>
-    <div class="nav-center">
-      <span class="admin-badge">⚡ Admin</span>
-    </div>
+    <span class="admin-badge">⚡ Admin</span>
     <div class="nav-right">
       <button class="logout-btn" onclick="signOut()">Sign Out</button>
     </div>
@@ -268,177 +195,264 @@
 
   <main>
     <div class="page-header">
-      <h1>Clinic Applications</h1>
-      <p>Review and approve providers applying to join PawPortal</p>
+      <h1>Admin Panel</h1>
+      <p>Manage clinic applications and user accounts</p>
     </div>
 
+    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card highlight">
-        <div class="stat-label">Pending Review</div>
+        <div class="stat-label">Pending Applications</div>
         <div class="stat-value" id="statPending">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Approved</div>
+        <div class="stat-label">Approved Clinics</div>
         <div class="stat-value" id="statApproved">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Rejected</div>
-        <div class="stat-value" id="statRejected">—</div>
+        <div class="stat-label">Pet Owners</div>
+        <div class="stat-value" id="statOwners">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Total Applications</div>
+        <div class="stat-label">Total Users</div>
         <div class="stat-value" id="statTotal">—</div>
       </div>
     </div>
 
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterProviders('all', this)">All</button>
-      <button class="filter-btn" onclick="filterProviders('pending', this)">Pending</button>
-      <button class="filter-btn" onclick="filterProviders('approved', this)">Approved</button>
-      <button class="filter-btn" onclick="filterProviders('rejected', this)">Rejected</button>
-    </div>
-
-    <div class="table-card">
-      <div class="loading" id="loadingState">Loading applications…</div>
-      <table id="providersTable" style="display:none">
-        <thead>
-          <tr>
-            <th>Business</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Bio</th>
-            <th>Applied</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="providersBody"></tbody>
-      </table>
-      <div class="empty-state" id="emptyState" style="display:none">
-        <div class="icon">📭</div>
-        <h3>No applications found</h3>
-        <p>Applications matching this filter will appear here</p>
+    <!-- Section tabs -->
+    <div class="section-tabs">
+      <div class="section-tab active" id="tabApplications" onclick="showSection('applications')">
+        Clinic Applications
+      </div>
+      <div class="section-tab" id="tabUsers" onclick="showSection('users')">
+        All Users
       </div>
     </div>
+
+    <!-- APPLICATIONS SECTION -->
+    <div id="sectionApplications">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterApps('all', this)">All</button>
+        <button class="filter-btn" onclick="filterApps('pending', this)">Pending</button>
+        <button class="filter-btn" onclick="filterApps('approved', this)">Approved</button>
+        <button class="filter-btn" onclick="filterApps('rejected', this)">Rejected</button>
+      </div>
+      <div class="table-card">
+        <div class="loading" id="loadingApps">Loading applications…</div>
+        <table id="appsTable" style="display:none">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Contact</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Bio</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="appsBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyApps" style="display:none">
+          <div class="icon">📭</div>
+          <h3>No applications found</h3>
+          <p>Applications matching this filter will appear here</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS SECTION -->
+    <div id="sectionUsers" style="display:none">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterUsers('all', this)">All</button>
+        <button class="filter-btn" onclick="filterUsers('owner', this)">Pet Owners</button>
+        <button class="filter-btn" onclick="filterUsers('clinic', this)">Clinics</button>
+        <button class="filter-btn" onclick="filterUsers('admin', this)">Admins</button>
+      </div>
+      <div class="table-card">
+        <div class="loading" id="loadingUsers">Loading users…</div>
+        <table id="usersTable" style="display:none">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyUsers" style="display:none">
+          <div class="icon">👤</div>
+          <h3>No users found</h3>
+          <p>Users matching this filter will appear here</p>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script type="module">
     import { supabase } from '/js/supabase.js';
 
-    const typeLabels = {
-      vet: 'Veterinarian',
-      groomer: 'Groomer',
-      walker: 'Dog Walker',
-      trainer: 'Trainer',
-      boarding: 'Boarding'
-    };
+    const typeLabels = { vet: 'Veterinarian', groomer: 'Groomer', walker: 'Dog Walker', trainer: 'Trainer', boarding: 'Boarding' };
 
     let allProviders = [];
+    let allUsers = [];
+    let currentAdminId = '';
 
     // Auth guard
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { window.location.href = '/login.html'; }
+    currentAdminId = session.user.id;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+    if (!profile || profile.role !== 'admin') { window.location.href = '/'; }
 
-    if (!profile || profile.role !== 'admin') {
-      window.location.href = '/';
-    }
+    // ── Section toggle ──
+    window.showSection = function(section) {
+      document.getElementById('sectionApplications').style.display = section === 'applications' ? 'block' : 'none';
+      document.getElementById('sectionUsers').style.display        = section === 'users'        ? 'block' : 'none';
+      document.getElementById('tabApplications').classList.toggle('active', section === 'applications');
+      document.getElementById('tabUsers').classList.toggle('active', section === 'users');
+    };
 
-    // Load all providers
+    // ── Load & render applications ──
     async function loadProviders() {
-      const { data } = await supabase
-        .from('providers')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const { data } = await supabase.from('providers').select('*').order('created_at', { ascending: false });
       allProviders = data || [];
-      updateStats(allProviders);
-      renderProviders(allProviders);
-      document.getElementById('loadingState').style.display = 'none';
+      updateStats();
+      renderApps(allProviders);
+      document.getElementById('loadingApps').style.display = 'none';
     }
 
-    function updateStats(providers) {
-      document.getElementById('statPending').textContent  = providers.filter(p => p.status === 'pending').length;
-      document.getElementById('statApproved').textContent = providers.filter(p => p.status === 'approved').length;
-      document.getElementById('statRejected').textContent = providers.filter(p => p.status === 'rejected').length;
-      document.getElementById('statTotal').textContent    = providers.length;
-    }
+    function renderApps(providers) {
+      const tbody = document.getElementById('appsBody');
+      const table = document.getElementById('appsTable');
+      const empty = document.getElementById('emptyApps');
 
-    function formatDate(iso) {
-      if (!iso) return '—';
-      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-
-    function renderProviders(providers) {
-      const tbody = document.getElementById('providersBody');
-      const table = document.getElementById('providersTable');
-      const empty = document.getElementById('emptyState');
-
-      if (providers.length === 0) {
-        table.style.display = 'none';
-        empty.style.display = 'block';
-        return;
-      }
-
-      table.style.display = 'table';
-      empty.style.display = 'none';
+      if (!providers.length) { table.style.display = 'none'; empty.style.display = 'block'; return; }
+      table.style.display = 'table'; empty.style.display = 'none';
 
       tbody.innerHTML = providers.map(p => {
-        const typeLabel = typeLabels[p.type] || p.type || '—';
-        const location  = [p.neighborhood, p.city, p.state].filter(Boolean).join(', ') || '—';
-        const bio       = p.bio || p.description || '';
-        const applied   = formatDate(p.created_at);
-        const status    = p.status || 'pending';
-
+        const status = p.status || 'pending';
+        const location = [p.neighborhood !== p.city ? p.neighborhood : null, p.city, p.state].filter(Boolean).join(', ') || '—';
         let actions = '';
         if (status === 'pending') {
-          actions = `
-            <button class="action-btn btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve ✓</button>
-            <button class="action-btn btn-reject"  onclick="updateStatus('${p.id}', 'rejected')">Reject ✗</button>`;
+          actions = `<button class="action-btn btn-approve" onclick="updateProviderStatus('${p.id}','approved')">Approve ✓</button>
+                     <button class="action-btn btn-reject"  onclick="updateProviderStatus('${p.id}','rejected')">Reject ✗</button>`;
         } else if (status === 'approved') {
-          actions = `<button class="action-btn btn-revoke" onclick="updateStatus('${p.id}', 'rejected')">Revoke</button>`;
-        } else if (status === 'rejected') {
-          actions = `<button class="action-btn btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve ✓</button>`;
+          actions = `<button class="action-btn btn-revoke" onclick="updateProviderStatus('${p.id}','rejected')">Revoke</button>`;
+        } else {
+          actions = `<button class="action-btn btn-approve" onclick="updateProviderStatus('${p.id}','approved')">Approve ✓</button>`;
         }
-
         return `<tr>
           <td>
-            <div class="business-name">${p.name || '—'}</div>
-            ${p.email ? `<div class="business-email">${p.email}</div>` : ''}
+            <div class="cell-primary">${p.name || '—'}</div>
+            <div class="cell-secondary">${typeLabels[p.type] || p.type || '—'}</div>
           </td>
-          <td>${typeLabel}</td>
+          <td>
+            <div class="cell-primary" style="font-weight:400">${p.contact_email || '—'}</div>
+          </td>
+          <td>${typeLabels[p.type] || p.type || '—'}</td>
           <td>${location}</td>
-          <td><div class="bio-cell" title="${bio.replace(/"/g, '&quot;')}">${bio || '—'}</div></td>
-          <td>${applied}</td>
-          <td><span class="status-badge status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
+          <td><div class="bio-cell" title="${(p.bio||'').replace(/"/g,'&quot;')}">${p.bio || '—'}</div></td>
+          <td style="color:var(--gray-500);font-size:0.82rem">${fmt(p.created_at)}</td>
+          <td><span class="status-badge status-${status}">${cap(status)}</span></td>
           <td><div class="action-btns">${actions}</div></td>
         </tr>`;
       }).join('');
     }
 
-    window.updateStatus = async function(id, status) {
+    window.updateProviderStatus = async function(id, status) {
       await supabase.from('providers').update({ status }).eq('id', id);
       await loadProviders();
     };
 
-    window.filterProviders = function(filter, btn) {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    window.filterApps = function(filter, btn) {
+      document.querySelectorAll('#sectionApplications .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const filtered = filter === 'all' ? allProviders : allProviders.filter(p => (p.status || 'pending') === filter);
-      renderProviders(filtered);
+      renderApps(filter === 'all' ? allProviders : allProviders.filter(p => (p.status || 'pending') === filter));
     };
+
+    // ── Load & render users ──
+    async function loadUsers() {
+      const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      allUsers = data || [];
+      updateStats();
+      renderUsers(allUsers);
+      document.getElementById('loadingUsers').style.display = 'none';
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('usersBody');
+      const table = document.getElementById('usersTable');
+      const empty = document.getElementById('emptyUsers');
+
+      if (!users.length) { table.style.display = 'none'; empty.style.display = 'block'; return; }
+      table.style.display = 'table'; empty.style.display = 'none';
+
+      tbody.innerHTML = users.map(u => {
+        const role = u.role || 'owner';
+        const isSelf = u.id === currentAdminId;
+        let actions = '';
+        if (!isSelf) {
+          if (role !== 'admin') {
+            actions += `<button class="action-btn btn-make-admin" onclick="updateUserRole('${u.id}','admin')">Make Admin</button>`;
+          } else {
+            actions += `<button class="action-btn btn-remove-admin" onclick="updateUserRole('${u.id}','owner')">Remove Admin</button>`;
+          }
+        } else {
+          actions = '<span style="font-size:0.78rem;color:var(--gray-500)">You</span>';
+        }
+        return `<tr>
+          <td>
+            <div class="cell-primary">${u.full_name || '—'}</div>
+            ${u.clinic_name ? `<div class="cell-secondary">🏥 ${u.clinic_name}</div>` : ''}
+          </td>
+          <td style="color:var(--gray-500);font-size:0.85rem">${u.email || '—'}</td>
+          <td><span class="status-badge role-${role}">${cap(role)}</span></td>
+          <td style="color:var(--gray-500);font-size:0.82rem">${fmt(u.created_at)}</td>
+          <td><div class="action-btns">${actions}</div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.updateUserRole = async function(id, role) {
+      await supabase.from('profiles').update({ role }).eq('id', id);
+      await loadUsers();
+    };
+
+    window.filterUsers = function(filter, btn) {
+      document.querySelectorAll('#sectionUsers .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderUsers(filter === 'all' ? allUsers : allUsers.filter(u => (u.role || 'owner') === filter));
+    };
+
+    // ── Stats ──
+    function updateStats() {
+      document.getElementById('statPending').textContent  = allProviders.filter(p => p.status === 'pending').length;
+      document.getElementById('statApproved').textContent = allProviders.filter(p => p.status === 'approved').length;
+      document.getElementById('statOwners').textContent   = allUsers.filter(u => u.role === 'owner').length;
+      document.getElementById('statTotal').textContent    = allUsers.length;
+    }
+
+    // ── Helpers ──
+    function fmt(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
     window.signOut = async function() {
       await supabase.auth.signOut();
       window.location.href = '/login.html';
     };
 
-    loadProviders();
+    // Load both in parallel
+    await Promise.all([loadProviders(), loadUsers()]);
   </script>
 
 </body>

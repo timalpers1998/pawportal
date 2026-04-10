@@ -545,6 +545,7 @@
           rating: 0,
           review_count: 0,
           next_available: 'By appointment',
+          contact_email: email,
         })
         .select()
         .single();
@@ -563,6 +564,7 @@
         full_name: fullName,
         clinic_name: businessName,
         provider_id: provider.id,
+        email: email,
       });
 
       // 4. Show success screen
